@@ -81,8 +81,15 @@ public class InventoryController {
     @PostMapping("/spares/save")
     @PreAuthorize("hasAnyRole('GERENTE', 'ASESOR_COMERCIAL')")
     public String saveSpare(@ModelAttribute Spare spare, RedirectAttributes flash) {
+        var existing = inventoryService.findSpareByReference(spare.getReference());
+        if (existing.isPresent()) {
+            flash.addFlashAttribute("warning",
+                    "Ya existe un repuesto con la referencia '" + spare.getReference() +
+                    "'. Actualiza su stock desde aquí.");
+            return "redirect:/inventory/spares/edit/" + existing.get().getId();
+        }
         inventoryService.saveSpare(spare);
-        flash.addFlashAttribute("success", "Spare part registered successfully.");
+        flash.addFlashAttribute("success", "Repuesto registrado exitosamente.");
         return "redirect:/inventory/spares";
     }
 
