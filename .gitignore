@@ -45,3 +45,6 @@ bin/
 ### .env ###
 .env
 .env.*
+
+### Claude Code ###
+CLAUDE.md

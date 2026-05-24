@@ -1,10 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repuestos | BQRINES</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
 </head>
 <body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 
+<div class="main-content container-fluid">
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+        <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="page-header">
+        <h2><i class="fas fa-cog me-2"></i>Inventario de Repuestos</h2>
+        <a sec:authorize="hasAnyRole('GERENTE','ASESOR_COMERCIAL')"
+           th:href="@{/inventory/spares/new}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Nuevo Repuesto
+        </a>
+    </div>
+
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Referencia</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th sec:authorize="hasAnyRole('GERENTE','ASESOR_COMERCIAL')">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(spares)}">
+                        <td colspan="8" class="text-center text-muted py-5">
+                            <i class="fas fa-cog fa-2x mb-2 d-block opacity-25"></i>
+                            No hay repuestos registrados.
+                        </td>
+                    </tr>
+                    <tr th:each="s : ${spares}">
+                        <td class="text-muted small" th:text="${s.id}"></td>
+                        <td class="fw-semibold" th:text="${s.name}"></td>
+                        <td><code th:text="${s.reference}"></code></td>
+                        <td><span class="badge bg-light text-dark" th:text="${s.category}"></span></td>
+                        <td th:text="'$' + ${#numbers.formatDecimal(s.price, 0, 'COMMA', 0, 'POINT')}"></td>
+                        <td>
+                            <span th:if="${s.stock == 0}" class="stock-off" th:text="${s.stock} + ' uds.'"></span>
+                            <span th:if="${s.stock > 0 and s.stock <= 3}" class="stock-low" th:text="${s.stock} + ' uds.'"></span>
+                            <span th:if="${s.stock > 3}" class="stock-ok" th:text="${s.stock} + ' uds.'"></span>
+                        </td>
+                        <td>
+                            <span th:if="${s.active}" class="badge bg-success-subtle text-success">Activo</span>
+                            <span th:unless="${s.active}" class="badge bg-danger-subtle text-danger">Inactivo</span>
+                        </td>
+                        <td sec:authorize="hasAnyRole('GERENTE','ASESOR_COMERCIAL')">
+                            <a th:href="@{/inventory/spares/edit/{id}(id=${s.id})}"
+                               class="btn btn-sm btn-outline-primary me-1">
+                                <i class="fas fa-pen"></i>
+                            </a>
+                            <a sec:authorize="hasRole('GERENTE')"
+                               th:href="@{/inventory/spares/delete/{id}(id=${s.id})}"
+                               class="btn btn-sm btn-outline-danger"
+                               onclick="return confirm('¿Eliminar este repuesto?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

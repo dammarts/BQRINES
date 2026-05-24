@@ -1,0 +1,98 @@
+:root {
+    --bq-primary: #1e3a5f;
+    --bq-primary-hover: #2d5282;
+    --bq-accent: #d4a017;
+    --bq-bg: #f0f2f5;
+}
+
+body {
+    background-color: var(--bq-bg);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Navbar ── */
+.app-navbar { background-color: var(--bq-primary); box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+.app-navbar .navbar-brand { color: var(--bq-accent) !important; font-weight: 800; letter-spacing: 1.5px; font-size: 1.25rem; }
+.app-navbar .nav-link { color: rgba(255,255,255,.85) !important; border-radius: 6px; transition: background .18s; }
+.app-navbar .nav-link:hover, .app-navbar .nav-link.active { background: rgba(255,255,255,.15); color: #fff !important; }
+.app-navbar .dropdown-menu { background-color: var(--bq-primary-hover); border: none; border-radius: 8px; margin-top: 4px; }
+.app-navbar .dropdown-item { color: rgba(255,255,255,.85); border-radius: 6px; padding: .45rem .9rem; }
+.app-navbar .dropdown-item:hover { background: rgba(255,255,255,.15); color: #fff; }
+.app-navbar .btn-outline-light { border-color: rgba(255,255,255,.4); }
+
+/* ── Layout ── */
+.main-content { padding: 2rem; min-height: calc(100vh - 58px); }
+
+/* ── Page header ── */
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+.page-header h2 { color: var(--bq-primary); font-weight: 700; margin: 0; }
+
+/* ── Stat cards ── */
+.stat-card {
+    background: #fff; border-radius: 12px; padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06); border-left: 4px solid var(--bq-primary);
+    transition: transform .2s, box-shadow .2s; height: 100%;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.1); }
+.stat-card.accent  { border-left-color: var(--bq-accent); }
+.stat-card.success { border-left-color: #198754; }
+.stat-card.danger  { border-left-color: #dc3545; }
+.stat-number { font-size: 2.2rem; font-weight: 700; color: var(--bq-primary); line-height: 1; }
+.stat-label  { color: #6c757d; font-size: .8rem; text-transform: uppercase; letter-spacing: .5px; margin-top: .35rem; }
+.stat-icon   { font-size: 1.8rem; opacity: .2; }
+
+/* ── Table card ── */
+.table-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.06); overflow: hidden; }
+.table-card .table { margin: 0; }
+.table-card .table thead th { background-color: var(--bq-primary); color: #fff; border: none; font-weight: 500; padding: .85rem 1rem; }
+.table-card .table tbody td { padding: .7rem 1rem; vertical-align: middle; border-color: #f0f2f5; }
+.table-card .table tbody tr:hover { background: #f8f9ff; }
+.table-card-header { padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0f2f5; }
+
+/* ── Form card ── */
+.form-card { background: #fff; border-radius: 12px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,.06); max-width: 680px; margin: 0 auto; }
+.form-label { font-weight: 500; color: #374151; }
+.form-control:focus, .form-select:focus { border-color: var(--bq-primary-hover); box-shadow: 0 0 0 .2rem rgba(30,58,95,.15); }
+
+/* ── Login ── */
+.login-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bq-primary) 0%, var(--bq-primary-hover) 100%);
+    display: flex; align-items: center; justify-content: center; padding: 1rem;
+}
+.login-card { background: #fff; border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+.login-brand { color: var(--bq-accent); font-size: 2rem; font-weight: 800; letter-spacing: 3px; text-align: center; }
+.login-sub   { text-align: center; color: #6c757d; font-size: .9rem; margin-bottom: 2rem; }
+
+/* ── Voucher ── */
+.voucher-card { background: #fff; border-radius: 12px; padding: 2.5rem; max-width: 520px; margin: 0 auto; box-shadow: 0 4px 20px rgba(0,0,0,.1); }
+.voucher-header { text-align: center; border-bottom: 2px dashed #dee2e6; padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
+.voucher-row { display: flex; justify-content: space-between; padding: .45rem 0; border-bottom: 1px solid #f0f2f5; font-size: .95rem; }
+.voucher-row:last-child { border-bottom: none; }
+.voucher-total { font-size: 1.3rem; font-weight: 700; color: var(--bq-primary); }
+
+/* ── Buttons ── */
+.btn-primary { background-color: var(--bq-primary) !important; border-color: var(--bq-primary) !important; }
+.btn-primary:hover { background-color: var(--bq-primary-hover) !important; border-color: var(--bq-primary-hover) !important; }
+
+/* ── Stock badges ── */
+.stock-low { background: #fff3cd; color: #856404; padding: .2em .55em; border-radius: 6px; font-size: .8rem; font-weight: 500; }
+.stock-ok  { background: #d1e7dd; color: #0a3622; padding: .2em .55em; border-radius: 6px; font-size: .8rem; font-weight: 500; }
+.stock-off { background: #f8d7da; color: #842029; padding: .2em .55em; border-radius: 6px; font-size: .8rem; font-weight: 500; }
+
+/* ── Alert banner ── */
+.alert-banner { background: linear-gradient(90deg,#fff3cd,#fef9e7); border-left: 4px solid var(--bq-accent); border-radius: 8px; padding: 1rem 1.25rem; }
+
+/* ── Alert badge on nav ── */
+.nav-alert-pos { position: relative; display: inline-block; }
+.nav-alert-badge { position: absolute; top: -5px; right: -8px; background: #dc3545; color: #fff; border-radius: 50%; width: 17px; height: 17px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+/* ── Role badges ── */
+.role-badge { font-size: .75rem; font-weight: 600; padding: .3em .65em; border-radius: 20px; }
+.role-gerente { background: #cfe2ff; color: #084298; }
+.role-asesor  { background: #d1e7dd; color: #0a3622; }
+.role-tecnico { background: #fff3cd; color: #664d03; }
+
+@media (max-width: 768px) {
+    .main-content { padding: 1rem; }
+}
