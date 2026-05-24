@@ -45,3 +45,4 @@ bin/
 ### .env ###
 .env
 .env.*
+!.env.example
