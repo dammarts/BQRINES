@@ -49,3 +49,6 @@ bin/
 
 ### Local dev credentials (never commit) ###
 src/main/resources/application-dev.properties
+
+### Claude Code ###
+CLAUDE.md
