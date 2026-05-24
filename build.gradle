@@ -32,6 +32,9 @@ dependencies {
     // Spring Boot DevTools — auto-restart on file changes during development
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
+    // Loads .env file as Spring property source (so DB_URL etc. work without setting env vars manually)
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+
     // Testing 
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
