@@ -44,8 +44,9 @@ public class Spare {
     @PrePersist
     @PreUpdate
     private void verifyStock() {
-        if (this.stock != null && this.stock < 0) {
+        if (this.stock != null && this.stock <= 0) {
             this.stock = 0;
+            this.active = false;
         }
     }
 }

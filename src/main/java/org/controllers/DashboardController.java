@@ -31,7 +31,6 @@ public class DashboardController {
                 model.addAttribute("totalVehicles", inventoryService.findActiveVehicles().size());
                 model.addAttribute("totalSpares", inventoryService.findActiveSpares().size());
                 model.addAttribute("totalSells", sellService.findAll().size());
-                model.addAttribute("vehicleAlerts", notificationService.getVehiclesWithLowStock());
                 model.addAttribute("spareAlerts", notificationService.getSparesWithLowStock());
                 model.addAttribute("totalAlerts", notificationService.getTotalAlerts());
                 return "dashboard/manager";

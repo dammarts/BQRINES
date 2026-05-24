@@ -81,26 +81,12 @@
                     <i class="fas fa-bell me-2 text-warning"></i>
                     Productos con stock bajo (≤ 3 unidades)
                 </div>
-                <div class="row g-3">
-                    <div class="col-md-6" th:if="${#lists.size(vehicleAlerts) > 0}">
-                        <p class="fw-semibold small mb-1 text-muted">VEHÍCULOS</p>
-                        <ul class="list-unstyled mb-0">
-                            <li th:each="v : ${vehicleAlerts}" class="d-flex justify-content-between py-1 border-bottom border-warning-subtle">
-                                <span th:text="${v.brand + ' ' + v.model + ' ' + v.year}"></span>
-                                <span class="stock-low ms-2" th:text="${v.stock} + ' uds.'"></span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6" th:if="${#lists.size(spareAlerts) > 0}">
-                        <p class="fw-semibold small mb-1 text-muted">REPUESTOS</p>
-                        <ul class="list-unstyled mb-0">
-                            <li th:each="s : ${spareAlerts}" class="d-flex justify-content-between py-1 border-bottom border-warning-subtle">
-                                <span th:text="${s.name}"></span>
-                                <span class="stock-low ms-2" th:text="${s.stock} + ' uds.'"></span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                <ul class="list-unstyled mb-0">
+                    <li th:each="s : ${spareAlerts}" class="d-flex justify-content-between py-1 border-bottom border-warning-subtle">
+                        <span th:text="${s.name + ' (' + s.reference + ')'}"></span>
+                        <span class="stock-low ms-2" th:text="${s.stock} + ' uds.'"></span>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
