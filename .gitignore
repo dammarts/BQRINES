@@ -46,3 +46,6 @@ bin/
 .env
 .env.*
 !.env.example
+
+### Local dev credentials (never commit) ###
+src/main/resources/application-dev.properties
