@@ -28,7 +28,6 @@ public class ReportController {
     public String index(Model model) {
         // Load all sells by default
         model.addAttribute("sells", sellService.findAll());
-        model.addAttribute("vehicleAlerts", notificationService.getVehiclesWithLowStock());
         model.addAttribute("spareAlerts", notificationService.getSparesWithLowStock());
         model.addAttribute("totalAlerts", notificationService.getTotalAlerts());
         return "reports/index";
@@ -42,7 +41,6 @@ public class ReportController {
         model.addAttribute("sells", sellService.findByDateRange(start, end));
         model.addAttribute("start", start);
         model.addAttribute("end", end);
-        model.addAttribute("vehicleAlerts", notificationService.getVehiclesWithLowStock());
         model.addAttribute("spareAlerts", notificationService.getSparesWithLowStock());
         model.addAttribute("totalAlerts", notificationService.getTotalAlerts());
         return "reports/index";

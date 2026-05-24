@@ -34,6 +34,7 @@ body {
     transition: transform .2s, box-shadow .2s; height: 100%;
 }
 .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.1); }
+.stat-card-link { cursor: pointer; }
 .stat-card.accent  { border-left-color: var(--bq-accent); }
 .stat-card.success { border-left-color: #198754; }
 .stat-card.danger  { border-left-color: #dc3545; }
@@ -76,9 +77,9 @@ body {
 .btn-primary:hover { background-color: var(--bq-primary-hover) !important; border-color: var(--bq-primary-hover) !important; }
 
 /* ── Stock badges ── */
-.stock-low { background: #fff3cd; color: #856404; padding: .2em .55em; border-radius: 6px; font-size: .8rem; font-weight: 500; }
+.stock-low { background: #fd7e14; color: #fff;    padding: .2em .55em; border-radius: 6px; font-size: .8rem; font-weight: 600; }
 .stock-ok  { background: #d1e7dd; color: #0a3622; padding: .2em .55em; border-radius: 6px; font-size: .8rem; font-weight: 500; }
-.stock-off { background: #f8d7da; color: #842029; padding: .2em .55em; border-radius: 6px; font-size: .8rem; font-weight: 500; }
+.stock-off { background: #dc3545; color: #fff;    padding: .2em .55em; border-radius: 6px; font-size: .8rem; font-weight: 600; }
 
 /* ── Alert banner ── */
 .alert-banner { background: linear-gradient(90deg,#fff3cd,#fef9e7); border-left: 4px solid var(--bq-accent); border-radius: 8px; padding: 1rem 1.25rem; }

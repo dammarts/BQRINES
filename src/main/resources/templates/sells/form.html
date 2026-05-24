@@ -56,7 +56,7 @@
                         <option th:each="v : ${vehicles}"
                                 th:value="${v.id}"
                                 th:text="${v.brand + ' ' + v.model + ' ' + v.year + ' — Stock: ' + v.stock}"
-                                th:attr="data-price=${v.price}">
+                                th:attr="data-price=${v.price},data-stock=${v.stock}">
                         </option>
                     </select>
                 </div>
@@ -69,7 +69,7 @@
                         <option th:each="s : ${spares}"
                                 th:value="${s.id}"
                                 th:text="${s.name + ' (' + s.reference + ') — Stock: ' + s.stock}"
-                                th:attr="data-price=${s.price}">
+                                th:attr="data-price=${s.price},data-stock=${s.stock}">
                         </option>
                     </select>
                 </div>
@@ -118,6 +118,9 @@ function toggleProduct() {
     document.getElementById('productId').value    = '';
     document.getElementById('unitaryPrice').value = '';
     document.getElementById('totalDisplay').textContent = '$0';
+    const qtyInput = document.querySelector('[name="quantity"]');
+    qtyInput.removeAttribute('max');
+    qtyInput.value = '';
     checkSubmit();
 }
 
@@ -126,6 +129,13 @@ function syncProduct(sel) {
     document.getElementById('productId').value = opt.value;
     if (opt.dataset.price) {
         document.getElementById('unitaryPrice').value = opt.dataset.price;
+    }
+    const qtyInput = document.querySelector('[name="quantity"]');
+    if (opt.dataset.stock) {
+        qtyInput.max = opt.dataset.stock;
+        if (parseInt(qtyInput.value) > parseInt(opt.dataset.stock)) {
+            qtyInput.value = opt.dataset.stock;
+        }
     }
     updateTotal();
     checkSubmit();

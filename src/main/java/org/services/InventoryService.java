@@ -91,6 +91,11 @@ public class InventoryService {
                 .orElseThrow(() -> new RuntimeException("Spare part not found with id: " + id));
     }
 
+    @Transactional(readOnly = true)
+    public java.util.Optional<Spare> findSpareByReference(String reference) {
+        return spareRepository.findByReference(reference);
+    }
+
     @Transactional
     public Spare saveSpare(Spare spare) {
         return spareRepository.save(spare);
@@ -104,6 +109,9 @@ public class InventoryService {
         existing.setCategory(data.getCategory());
         existing.setPrice(data.getPrice());
         existing.setStock(data.getStock());
+        if (data.getStock() != null && data.getStock() > 0) {
+            existing.setActive(true);
+        }
         return spareRepository.save(existing);
     }
 
@@ -120,7 +128,12 @@ public class InventoryService {
                     "Insufficient stock for spare part: " + spare.getName()
             );
         }
-        spare.setStock(spare.getStock() - quantity);
+        int newStock = spare.getStock() - quantity;
+        spare.setStock(newStock);
+        if (newStock <= 0) {
+            spare.setStock(0);
+            spare.setActive(false);
+        }
         spareRepository.save(spare);
     }
 

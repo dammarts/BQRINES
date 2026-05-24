@@ -24,7 +24,7 @@ public class SellService {
     public Sell registerSell(Sell sell) {
         if (sell.getProductType().equalsIgnoreCase("vehicle")) {
             inventoryService.discountVehicleStock(sell.getProductId(), sell.getQuantity());
-        } else if (sell.getProductType().equalsIgnoreCase("spare")) {
+        } else if (sell.getProductType().equalsIgnoreCase("spares")) {
             inventoryService.discountSpareStock(sell.getProductId(), sell.getQuantity());
         } else {
             throw new RuntimeException("Unknown product type: " + sell.getProductType());
