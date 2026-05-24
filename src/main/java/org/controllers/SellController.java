@@ -38,8 +38,16 @@ public class SellController {
 
     @PostMapping("/save")
     public String save(@ModelAttribute Sell sell, Authentication auth, RedirectAttributes flash) {
-        // Capture the authenticated user email for audit trail
         sell.setRegisteredBy(auth.getName());
+
+        if ("vehicle".equalsIgnoreCase(sell.getProductType())) {
+            var v = inventoryService.findVehicleById(sell.getProductId());
+            sell.setProductName(v.getBrand() + " " + v.getModel() + " " + v.getYear());
+        } else if ("spares".equalsIgnoreCase(sell.getProductType())) {
+            var s = inventoryService.findSpareById(sell.getProductId());
+            sell.setProductName(s.getName() + " (" + s.getReference() + ")");
+        }
+
         Sell saved = sellService.registerSell(sell);
         flash.addFlashAttribute("success", "Sale registered successfully.");
         return "redirect:/sells/voucher/" + saved.getId();

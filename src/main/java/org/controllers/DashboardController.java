@@ -28,8 +28,8 @@ public class DashboardController {
 
         switch (role) {
             case "ROLE_GERENTE" -> {
-                model.addAttribute("totalVehicles", inventoryService.findAllVehicles().size());
-                model.addAttribute("totalSpares", inventoryService.findAllSpares().size());
+                model.addAttribute("totalVehicles", inventoryService.findActiveVehicles().size());
+                model.addAttribute("totalSpares", inventoryService.findActiveSpares().size());
                 model.addAttribute("totalSells", sellService.findAll().size());
                 model.addAttribute("vehicleAlerts", notificationService.getVehiclesWithLowStock());
                 model.addAttribute("spareAlerts", notificationService.getSparesWithLowStock());

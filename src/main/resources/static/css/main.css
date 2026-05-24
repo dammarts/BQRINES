@@ -34,6 +34,7 @@ body {
     transition: transform .2s, box-shadow .2s; height: 100%;
 }
 .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.1); }
+.stat-card-link { cursor: pointer; }
 .stat-card.accent  { border-left-color: var(--bq-accent); }
 .stat-card.success { border-left-color: #198754; }
 .stat-card.danger  { border-left-color: #dc3545; }
