@@ -45,3 +45,10 @@ bin/
 ### .env ###
 .env
 .env.*
+!.env.example
+
+### Local dev credentials (never commit) ###
+src/main/resources/application-dev.properties
+
+### Claude Code ###
+CLAUDE.md

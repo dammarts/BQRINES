@@ -32,6 +32,7 @@ dependencies {
     // Spring Boot DevTools — auto-restart on file changes during development
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
+
     // Testing 
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -40,4 +41,10 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+// Activate the "dev" Spring profile when running locally.
+// application-dev.properties (gitignored) holds the actual DB credentials.
+bootRun {
+    args '--spring.profiles.active=dev'
 }

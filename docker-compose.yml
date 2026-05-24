@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bqrines-db
+    environment:
+      POSTGRES_DB: bqrines
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - bqrines_data:/var/lib/postgresql/data
+
+volumes:
+  bqrines_data:
