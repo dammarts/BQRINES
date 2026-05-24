@@ -109,6 +109,9 @@ public class InventoryService {
         existing.setCategory(data.getCategory());
         existing.setPrice(data.getPrice());
         existing.setStock(data.getStock());
+        if (data.getStock() != null && data.getStock() > 0) {
+            existing.setActive(true);
+        }
         return spareRepository.save(existing);
     }
 
