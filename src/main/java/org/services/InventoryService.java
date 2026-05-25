@@ -68,7 +68,10 @@ public class InventoryService {
 
     @Transactional
     public void deleteVehicle(Long id) {
-        vehicleRepository.delete(findVehicleById(id));
+        Vehicle v = findVehicleById(id);
+        v.setDeletedAt(java.time.LocalDateTime.now());
+        v.setActive(false);
+        vehicleRepository.save(v);
     }
 
     @Transactional
@@ -127,7 +130,10 @@ public class InventoryService {
 
     @Transactional
     public void deleteSpare(Long id) {
-        spareRepository.delete(findSpareById(id));
+        Spare s = findSpareById(id);
+        s.setDeletedAt(java.time.LocalDateTime.now());
+        s.setActive(false);
+        spareRepository.save(s);
     }
 
     @Transactional

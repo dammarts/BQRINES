@@ -42,8 +42,16 @@
         </div>
 
         <div class="voucher-row">
+            <span class="text-muted">Fecha y hora</span>
+            <span th:text="${#temporals.format(sell.date, 'dd/MM/yyyy HH:mm:ss')}"></span>
+        </div>
+        <div class="voucher-row">
             <span class="text-muted">Cliente</span>
             <span class="fw-semibold" th:text="${sell.clientName}"></span>
+        </div>
+        <div class="voucher-row" th:if="${sell.buyerDocument != null and !#strings.isEmpty(sell.buyerDocument)}">
+            <span class="text-muted">N° Identificación</span>
+            <span th:text="${sell.buyerDocument}"></span>
         </div>
 
         <!-- Items table -->

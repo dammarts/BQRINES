@@ -116,10 +116,21 @@
 
                 <form id="sellForm" th:action="@{/sells/save}" method="post">
 
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-7">
+                            <label class="form-label">Cliente</label>
+                            <input type="text" name="clientName" class="form-control"
+                                   placeholder="Nombre del cliente" required maxlength="150">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">N° Identificación</label>
+                            <input type="text" name="buyerDocument" class="form-control"
+                                   placeholder="CC / NIT / CE" maxlength="50">
+                        </div>
+                    </div>
                     <div class="mb-3">
-                        <label class="form-label">Cliente</label>
-                        <input type="text" name="clientName" class="form-control"
-                               placeholder="Nombre del cliente" required maxlength="150">
+                        <label class="form-label text-muted small">Fecha y hora de la venta</label>
+                        <div class="form-control bg-light text-muted" id="saleDateTime" style="font-size:.9rem;"></div>
                     </div>
 
                     <div id="hiddenInputs"></div>
@@ -165,6 +176,17 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// Live clock
+function updateClock() {
+    const now = new Date();
+    document.getElementById('saleDateTime').textContent = now.toLocaleString('es-CO', {
+        day:'2-digit', month:'2-digit', year:'numeric',
+        hour:'2-digit', minute:'2-digit', second:'2-digit'
+    });
+}
+updateClock();
+setInterval(updateClock, 1000);
+
 let cart = [];
 
 function toggleProduct() {

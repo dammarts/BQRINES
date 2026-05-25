@@ -35,6 +35,9 @@ public class Sell {
     @Column(nullable = false, length = 150)
     private String clientName;
 
+    @Column(length = 50)
+    private String buyerDocument;
+
     @Column(nullable = false)
     private Double total;
 

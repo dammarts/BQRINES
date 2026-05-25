@@ -42,6 +42,7 @@ public class SellController {
     @PostMapping("/save")
     public String save(
             @RequestParam String clientName,
+            @RequestParam(required = false) String buyerDocument,
             @RequestParam("itemProductType") List<String> productTypes,
             @RequestParam("itemProductId") List<Long> productIds,
             @RequestParam("itemProductName") List<String> productNames,
@@ -51,6 +52,7 @@ public class SellController {
 
         Sell sell = new Sell();
         sell.setClientName(clientName);
+        sell.setBuyerDocument(buyerDocument);
         sell.setRegisteredBy(auth.getName());
 
         List<SellItem> items = new ArrayList<>();
