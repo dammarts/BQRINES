@@ -203,7 +203,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="sp : ${allSpares}">
+                            <tr th:each="sp : ${allSpares}" class="spare-row"
+                                th:data-id="${sp.id}"
+                                th:data-name="${sp.name}"
+                                th:data-ref="${sp.reference}"
+                                th:data-price="${sp.price}">
                                 <td th:text="${sp.name}"></td>
                                 <td><code th:text="${sp.reference}"></code></td>
                                 <td>
@@ -213,8 +217,7 @@
                                 </td>
                                 <td th:text="${'$' + #numbers.formatDecimal(sp.price,1,'COMMA',0,'POINT')}"></td>
                                 <td>
-                                    <button type="button" class="btn btn-sm btn-outline-success"
-                                            th:onclick="'fillSpareForm(' + ${sp.id} + ',\'' + ${sp.name} + '\',\'' + ${sp.reference} + '\',' + ${sp.price} + ')'">
+                                    <button type="button" class="btn btn-sm btn-outline-success btn-select-spare">
                                         Agregar
                                     </button>
                                 </td>
@@ -258,14 +261,28 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-function fillSpareForm(id, name, ref, price) {
-    document.getElementById('spareId').value = id;
-    document.getElementById('spareName').value = name;
-    document.getElementById('spareNameDisplay').value = name + ' [' + ref + ']';
-    document.getElementById('spareReference').value = ref;
-    document.getElementById('unitaryPrice').value = price;
-    document.getElementById('addBtn').disabled = false;
-}
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.btn-select-spare').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var row = btn.closest('.spare-row');
+            var id    = row.dataset.id;
+            var name  = row.dataset.name;
+            var ref   = row.dataset.ref;
+            var price = row.dataset.price;
+
+            document.getElementById('spareId').value = id;
+            document.getElementById('spareName').value = name;
+            document.getElementById('spareNameDisplay').value = name + ' [' + ref + ']';
+            document.getElementById('spareReference').value = ref;
+            document.getElementById('unitaryPrice').value = price;
+            document.getElementById('addBtn').disabled = false;
+
+            // Highlight selected row
+            document.querySelectorAll('.spare-row').forEach(r => r.classList.remove('table-success'));
+            row.classList.add('table-success');
+        });
+    });
+});
 </script>
 </body>
 </html>
