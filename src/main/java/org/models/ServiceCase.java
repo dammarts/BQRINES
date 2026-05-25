@@ -44,6 +44,11 @@ public class ServiceCase {
     @Column(length = 1000)
     private String asorNotes;
 
+    private Double laborPrice;
+
+    @Column(length = 300)
+    private String laborDescription;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 

@@ -99,4 +99,16 @@ public class ServiceCaseService {
         sc.setTechnicianNotes(notes);
         caseRepository.save(sc);
     }
+
+    @Transactional
+    public ServiceCase technicianUpdate(Long caseId, CaseStatus status, String technicianNotes,
+                                        String laborDescription, Double laborPrice) {
+        ServiceCase sc = caseRepository.findById(caseId)
+                .orElseThrow(() -> new RuntimeException("Caso no encontrado: " + caseId));
+        if (status != null) sc.setStatus(status);
+        if (technicianNotes != null) sc.setTechnicianNotes(technicianNotes);
+        if (laborDescription != null && !laborDescription.isBlank()) sc.setLaborDescription(laborDescription);
+        if (laborPrice != null && laborPrice > 0) sc.setLaborPrice(laborPrice);
+        return caseRepository.save(sc);
+    }
 }

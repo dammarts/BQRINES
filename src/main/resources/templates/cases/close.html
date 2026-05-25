@@ -96,10 +96,39 @@
                 </div>
             </div>
 
+            <!-- Labor charge pre-loaded from technician (if set) -->
+            <div th:if="${sc.laborPrice != null and sc.laborPrice > 0}"
+                 class="row g-2 align-items-center mb-2 item-row border-start border-warning border-3 ps-2">
+                <input type="hidden" name="itemProductType" value="extra">
+                <input type="hidden" name="itemProductId" value="0">
+                <div class="col-md-5">
+                    <input type="text" name="itemProductName" class="form-control form-control-sm"
+                           th:value="${sc.laborDescription != null and !sc.laborDescription.isEmpty()} ? sc.laborDescription : 'Mano de obra'">
+                    <div class="form-text text-warning-emphasis small">Cargado por el técnico</div>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" name="itemQuantity" class="form-control form-control-sm item-qty"
+                           value="1" min="1">
+                </div>
+                <div class="col-md-2">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text">$</span>
+                        <input type="number" name="itemUnitaryPrice" class="form-control item-price"
+                               step="0.01" th:value="${sc.laborPrice}">
+                    </div>
+                </div>
+                <div class="col-md-2 text-end fw-semibold subtotal-display">
+                    $<span th:text="${#numbers.formatDecimal(sc.laborPrice,1,'COMMA',0,'POINT')}"></span>
+                </div>
+                <div class="col-auto">
+                    <span class="badge bg-warning text-dark"><i class="fas fa-hard-hat me-1"></i>Labor</span>
+                </div>
+            </div>
+
             <!-- Extra charges row (labor, etc.) -->
             <div id="extraRows"></div>
             <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="addExtra()">
-                <i class="fas fa-plus me-1"></i>Agregar cargo extra (mano de obra, etc.)
+                <i class="fas fa-plus me-1"></i>Agregar cargo extra
             </button>
         </div>
 

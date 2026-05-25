@@ -121,20 +121,70 @@
                 </form>
             </div>
 
-            <!-- Technician notes (TECNICO) -->
-            <div th:if="${isTecnico}" class="card p-3 mb-3">
-                <h6 class="fw-bold mb-2"><i class="fas fa-wrench me-1 text-primary"></i>Mis notas técnicas</h6>
-                <form th:action="@{/cases/{id}/tech-notes(id=${sc.id})}" method="post">
-                    <textarea name="technicianNotes" class="form-control form-control-sm mb-2" rows="3"
-                              th:text="${sc.technicianNotes}" placeholder="Diagnóstico, observaciones..."></textarea>
-                    <button type="submit" class="btn btn-sm btn-outline-primary">Guardar notas</button>
+            <!-- Technician full update form -->
+            <div th:if="${isTecnico and sc.status.name() != 'ENTREGADO'}" class="card p-3 mb-3 border-primary">
+                <h6 class="fw-bold mb-3"><i class="fas fa-wrench me-1 text-primary"></i>Actualizar caso</h6>
+                <form th:action="@{/cases/{id}/tech-update(id=${sc.id})}" method="post">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small">Estado del caso</label>
+                            <select name="status" class="form-select form-select-sm">
+                                <option th:each="s : ${statuses}"
+                                        th:value="${s.name()}"
+                                        th:text="${s.name().replace('_',' ')}"
+                                        th:selected="${s == sc.status}"
+                                        th:disabled="${s.name() == 'ENTREGADO'}"></option>
+                            </select>
+                            <div class="form-text">Pon <strong>LISTO</strong> cuando el trabajo esté terminado.</div>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold small">Notas técnicas / diagnóstico</label>
+                            <textarea name="technicianNotes" class="form-control form-control-sm" rows="3"
+                                      th:text="${sc.technicianNotes}"
+                                      placeholder="Diagnóstico, trabajos realizados, observaciones..."></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Descripción mano de obra</label>
+                            <input type="text" name="laborDescription" class="form-control form-control-sm"
+                                   th:value="${sc.laborDescription}"
+                                   placeholder="Ej: Cambio de aceite y filtro">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small">Precio mano de obra ($)</label>
+                            <input type="number" name="laborPrice" class="form-control form-control-sm"
+                                   step="0.01" min="0"
+                                   th:value="${sc.laborPrice}"
+                                   placeholder="0.00">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary btn-sm w-100">
+                                <i class="fas fa-save me-1"></i>Guardar cambios
+                            </button>
+                        </div>
+                    </div>
                 </form>
             </div>
 
-            <!-- Tech notes read-only for asesor/gerente -->
-            <div th:if="${(isAsesor or isGerente) and sc.technicianNotes != null and !sc.technicianNotes.isEmpty()}" class="card p-3 mb-3">
-                <h6 class="fw-bold mb-2"><i class="fas fa-wrench me-1 text-secondary"></i>Notas del técnico</h6>
-                <p class="mb-0 small" th:text="${sc.technicianNotes}"></p>
+            <!-- Tech summary read-only (ASESOR / GERENTE) -->
+            <div th:if="${isAsesor or isGerente}" class="card p-3 mb-3">
+                <h6 class="fw-bold mb-2"><i class="fas fa-wrench me-1 text-secondary"></i>Reporte del técnico</h6>
+                <div th:if="${sc.technicianNotes != null and !sc.technicianNotes.isEmpty()}" class="mb-2">
+                    <span class="text-muted small fw-semibold">Notas:</span>
+                    <p class="mb-0 small" th:text="${sc.technicianNotes}"></p>
+                </div>
+                <div th:if="${sc.laborPrice != null and sc.laborPrice > 0}"
+                     class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
+                    <span class="small fw-semibold"
+                          th:text="${sc.laborDescription != null and !sc.laborDescription.isEmpty()} ? sc.laborDescription : 'Mano de obra'">
+                        Mano de obra
+                    </span>
+                    <span class="fw-bold text-success"
+                          th:text="${'$' + #numbers.formatDecimal(sc.laborPrice,1,'COMMA',0,'POINT')}"></span>
+                </div>
+                <div th:if="${(sc.technicianNotes == null or sc.technicianNotes.isEmpty()) and (sc.laborPrice == null or sc.laborPrice == 0)}"
+                     class="text-muted small">
+                    El técnico aún no ha reportado diagnóstico ni mano de obra.
+                </div>
             </div>
 
             <!-- Spare items -->

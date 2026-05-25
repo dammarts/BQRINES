@@ -199,18 +199,21 @@ public class ServiceCaseController {
     }
 
     // -------------------------------------------------------------------------
-    // TECHNICIAN NOTES
+    // TECHNICIAN UPDATE (status + notes + labor)
     // -------------------------------------------------------------------------
 
-    @PostMapping("/{id}/tech-notes")
+    @PostMapping("/{id}/tech-update")
     @PreAuthorize("hasRole('SERVICIO_TECNICO')")
-    public String saveTechNotes(
+    public String techUpdate(
             @PathVariable Long id,
-            @RequestParam String technicianNotes,
+            @RequestParam CaseStatus status,
+            @RequestParam(required = false) String technicianNotes,
+            @RequestParam(required = false) String laborDescription,
+            @RequestParam(required = false) Double laborPrice,
             RedirectAttributes flash) {
 
-        caseService.updateTechnicianNotes(id, technicianNotes);
-        flash.addFlashAttribute("success", "Notas guardadas.");
+        caseService.technicianUpdate(id, status, technicianNotes, laborDescription, laborPrice);
+        flash.addFlashAttribute("success", "Caso actualizado correctamente.");
         return "redirect:/cases/" + id;
     }
 
