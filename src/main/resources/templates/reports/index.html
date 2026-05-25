@@ -21,24 +21,16 @@
     <!-- Low-stock alerts -->
     <div th:if="${totalAlerts > 0}" class="alert-banner mb-4">
         <span class="fw-semibold"><i class="fas fa-bell me-2 text-warning"></i>
-            <span th:text="${totalAlerts}"></span> producto(s) con stock bajo
+            <span th:text="${totalAlerts}"></span> repuesto(s) con stock bajo o agotado
         </span>
         <div class="row g-3 mt-1">
-            <div class="col-md-6" th:if="${#lists.size(vehicleAlerts) > 0}">
-                <p class="fw-semibold small mb-1 text-muted">VEHÍCULOS</p>
-                <ul class="list-unstyled mb-0">
-                    <li th:each="v : ${vehicleAlerts}" class="d-flex justify-content-between py-1">
-                        <span th:text="${v.brand + ' ' + v.model}"></span>
-                        <span class="stock-low" th:text="${v.stock} + ' uds.'"></span>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-md-6" th:if="${#lists.size(spareAlerts) > 0}">
+            <div class="col-md-6" th:if="${not #lists.isEmpty(spareAlerts)}">
                 <p class="fw-semibold small mb-1 text-muted">REPUESTOS</p>
                 <ul class="list-unstyled mb-0">
                     <li th:each="s : ${spareAlerts}" class="d-flex justify-content-between py-1">
                         <span th:text="${s.name}"></span>
-                        <span class="stock-low" th:text="${s.stock} + ' uds.'"></span>
+                        <span th:if="${s.stock == 0}" class="stock-off" th:text="${s.stock} + ' uds.'"></span>
+                        <span th:if="${s.stock > 0}" class="stock-low" th:text="${s.stock} + ' uds.'"></span>
                     </li>
                 </ul>
             </div>
@@ -105,17 +97,16 @@
                         <th>#</th>
                         <th>Fecha</th>
                         <th>Cliente</th>
-                        <th>Producto</th>
-                        <th>Tipo</th>
-                        <th>Cant.</th>
-                        <th>Precio Unit.</th>
+                        <th>Identificación</th>
+                        <th>Productos</th>
                         <th>Total</th>
                         <th>Registrado por</th>
+                        <th>Comprobante</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:if="${#lists.isEmpty(sells)}">
-                        <td colspan="9" class="text-center text-muted py-5">
+                        <td colspan="8" class="text-center text-muted py-5">
                             <i class="fas fa-chart-bar fa-2x mb-2 d-block opacity-25"></i>
                             No hay ventas en este período.
                         </td>
@@ -124,15 +115,25 @@
                         <td class="text-muted small" th:text="${s.id}"></td>
                         <td class="small" th:text="${#temporals.format(s.date, 'dd/MM/yyyy HH:mm')}"></td>
                         <td class="fw-semibold" th:text="${s.clientName}"></td>
-                        <td th:text="${s.productName}"></td>
+                        <td class="small text-muted" th:text="${s.buyerDocument != null and !#strings.isEmpty(s.buyerDocument)} ? ${s.buyerDocument} : '—'"></td>
                         <td>
-                            <span th:if="${s.productType == 'vehicle'}" class="badge bg-primary-subtle text-primary">Vehículo</span>
-                            <span th:if="${s.productType == 'spares'}"  class="badge bg-warning-subtle text-warning-emphasis">Repuesto</span>
+                            <span th:if="${#lists.isEmpty(s.items)}" class="text-muted small">—</span>
+                            <div th:each="item : ${s.items}" class="d-flex align-items-center gap-1 mb-1">
+                                <span th:if="${item.productType == 'vehicle'}" class="badge bg-primary-subtle text-primary" style="font-size:.65rem;">V</span>
+                                <span th:if="${item.productType == 'spares'}"  class="badge bg-warning-subtle text-warning-emphasis" style="font-size:.65rem;">R</span>
+                                <span th:if="${item.productType == 'extra'}"   class="badge bg-secondary-subtle text-secondary" style="font-size:.65rem;">E</span>
+                                <span class="small" th:text="${item.productName}"></span>
+                                <span class="text-muted small">× <span th:text="${item.quantity}"></span></span>
+                            </div>
                         </td>
-                        <td th:text="${s.quantity}"></td>
-                        <td th:text="'$' + ${#numbers.formatDecimal(s.unitaryPrice, 0, 'COMMA', 0, 'POINT')}"></td>
                         <td class="fw-semibold" th:text="'$' + ${#numbers.formatDecimal(s.total, 0, 'COMMA', 0, 'POINT')}"></td>
                         <td class="small text-muted" th:text="${s.registeredBy}"></td>
+                        <td>
+                            <a th:href="@{/sells/voucher/{id}(id=${s.id})}"
+                               class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-file-invoice"></i>
+                            </a>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -142,6 +143,5 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script th:src="@{/js/stock-alert.js}"></script>
 </body>
 </html>

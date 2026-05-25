@@ -74,7 +74,11 @@
                                   th:title="${s.updatedAt != null ? 'Editado: ' + #temporals.format(s.updatedAt, 'dd/MM/yyyy HH:mm') : 'Sin ediciones'}"
                                   th:text="${#temporals.format(s.createdAt, 'dd/MM/yyyy HH:mm')}"
                                   style="cursor:default;" data-bs-toggle="tooltip"></span>
-                            <span th:if="${s.createdAt == null}">—</span>
+                            <span th:if="${s.createdAt == null and s.updatedAt != null}"
+                                  th:title="'Editado: ' + ${#temporals.format(s.updatedAt, 'dd/MM/yyyy HH:mm')}"
+                                  th:text="'Act. ' + ${#temporals.format(s.updatedAt, 'dd/MM/yyyy HH:mm')}"
+                                  style="cursor:default;" data-bs-toggle="tooltip"></span>
+                            <span th:if="${s.createdAt == null and s.updatedAt == null}">—</span>
                         </td>
                         <td sec:authorize="hasAnyRole('GERENTE','ASESOR_COMERCIAL')">
                             <a th:href="@{/inventory/spares/edit/{id}(id=${s.id})}"

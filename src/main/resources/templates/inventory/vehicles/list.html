@@ -77,7 +77,11 @@
                                   th:title="${v.updatedAt != null ? 'Editado: ' + #temporals.format(v.updatedAt, 'dd/MM/yyyy HH:mm') : 'Sin ediciones'}"
                                   th:text="${#temporals.format(v.createdAt, 'dd/MM/yyyy HH:mm')}"
                                   style="cursor:default;" data-bs-toggle="tooltip"></span>
-                            <span th:if="${v.createdAt == null}">—</span>
+                            <span th:if="${v.createdAt == null and v.updatedAt != null}"
+                                  th:title="'Editado: ' + ${#temporals.format(v.updatedAt, 'dd/MM/yyyy HH:mm')}"
+                                  th:text="'Act. ' + ${#temporals.format(v.updatedAt, 'dd/MM/yyyy HH:mm')}"
+                                  style="cursor:default;" data-bs-toggle="tooltip"></span>
+                            <span th:if="${v.createdAt == null and v.updatedAt == null}">—</span>
                         </td>
                         <td sec:authorize="hasRole('GERENTE')">
                             <a th:href="@{/inventory/vehicles/edit/{id}(id=${v.id})}"
