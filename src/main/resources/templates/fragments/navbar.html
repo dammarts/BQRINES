@@ -27,7 +27,7 @@
                         <i class="fas fa-boxes me-1"></i> Inventario
                     </a>
                     <ul class="dropdown-menu">
-                        <li>
+                        <li sec:authorize="hasAnyRole('GERENTE','ASESOR_COMERCIAL')">
                             <a class="dropdown-item" th:href="@{/inventory/vehicles}">
                                 <i class="fas fa-car me-1"></i> Vehículos
                             </a>
@@ -40,7 +40,7 @@
                     </ul>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="hasAnyRole('GERENTE','ASESOR_COMERCIAL')">
                     <a class="nav-link" th:href="@{/sells}">
                         <i class="fas fa-receipt me-1"></i> Ventas
                     </a>

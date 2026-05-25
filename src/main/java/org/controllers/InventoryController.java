@@ -20,6 +20,7 @@ public class InventoryController {
     // ── Vehicle ───────────────────────────────────────────────────────────────
 
     @GetMapping("/vehicles")
+    @PreAuthorize("hasAnyRole('GERENTE', 'ASESOR_COMERCIAL')")
     public String listVehicles(Model model) {
         model.addAttribute("vehicles", inventoryService.findAllVehicles());
         return "inventory/vehicles/list";

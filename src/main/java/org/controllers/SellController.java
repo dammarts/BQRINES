@@ -17,7 +17,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/sells")
-@PreAuthorize("hasAnyRole('GERENTE', 'ASESOR_COMERCIAL', 'SERVICIO_TECNICO')")
+@PreAuthorize("hasAnyRole('GERENTE', 'ASESOR_COMERCIAL')")
 public class SellController {
 
     @Autowired
@@ -27,8 +27,13 @@ public class SellController {
     private InventoryService inventoryService;
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("sells", sellService.findAll());
+    public String list(Model model, Authentication auth) {
+        boolean isGerente = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_GERENTE"));
+        List<Sell> sells = isGerente
+                ? sellService.findAll()
+                : sellService.findByUser(auth.getName());
+        model.addAttribute("sells", sells);
         return "sells/list";
     }
 
