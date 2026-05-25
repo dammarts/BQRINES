@@ -68,6 +68,7 @@
                         <td>
                             <span th:if="${item.productType == 'vehicle'}" class="badge bg-primary-subtle text-primary">Vehículo</span>
                             <span th:if="${item.productType == 'spares'}"  class="badge bg-warning-subtle text-warning-emphasis">Repuesto</span>
+                            <span th:if="${item.productType == 'extra'}"   class="badge bg-secondary-subtle text-secondary">Extra</span>
                         </td>
                         <td class="text-center" th:text="${item.quantity}"></td>
                         <td class="text-end" th:text="'$' + ${#numbers.formatDecimal(item.unitaryPrice, 0, 'COMMA', 0, 'POINT')}"></td>

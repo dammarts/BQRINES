@@ -70,9 +70,12 @@
 
                 <div class="row g-2 mb-3">
                     <div class="col-6">
-                        <label class="form-label">Precio ($)</label>
-                        <input type="number" id="unitaryPrice" class="form-control"
-                               placeholder="0.00" min="0" step="0.01">
+                        <label class="form-label">
+                            Precio ($)
+                            <i class="fas fa-lock text-muted ms-1" id="priceLockIcon" style="font-size:.75rem;" title="Precio fijado por inventario"></i>
+                        </label>
+                        <input type="number" id="unitaryPrice" class="form-control bg-light"
+                               placeholder="0.00" min="0" step="0.01" readonly>
                     </div>
                     <div class="col-6">
                         <label class="form-label">Cantidad</label>
@@ -81,8 +84,25 @@
                     </div>
                 </div>
 
-                <button type="button" class="btn btn-primary w-100" onclick="addToCart()">
+                <button type="button" class="btn btn-primary w-100 mb-3" onclick="addToCart()">
                     <i class="fas fa-cart-plus me-2"></i>Agregar al carrito
+                </button>
+
+                <!-- Extra charge -->
+                <hr class="my-2">
+                <h6 class="fw-bold mb-2 text-muted text-uppercase" style="font-size:.75rem;letter-spacing:.5px;">
+                    <i class="fas fa-wrench me-1"></i>Cobro extra
+                </h6>
+                <div class="mb-2">
+                    <input type="text" id="extraName" class="form-control form-control-sm"
+                           placeholder="Ej: Mano de obra, instalación..." maxlength="200">
+                </div>
+                <div class="mb-2">
+                    <input type="number" id="extraPrice" class="form-control form-control-sm"
+                           placeholder="Valor ($)" min="0" step="0.01">
+                </div>
+                <button type="button" class="btn btn-outline-warning w-100 btn-sm" onclick="addExtra()">
+                    <i class="fas fa-plus me-1"></i>Agregar cobro extra
                 </button>
             </div>
         </div>
@@ -102,10 +122,8 @@
                                placeholder="Nombre del cliente" required maxlength="150">
                     </div>
 
-                    <!-- Cart items hidden inputs are injected here by JS -->
                     <div id="hiddenInputs"></div>
 
-                    <!-- Cart table -->
                     <div class="table-responsive mb-3">
                         <table class="table table-sm" id="cartTable">
                             <thead class="table-light">
@@ -164,7 +182,7 @@ function syncProduct(sel) {
     const opt = sel.options[sel.selectedIndex];
     if (opt.dataset.price) document.getElementById('unitaryPrice').value = opt.dataset.price;
     if (opt.dataset.stock) {
-        document.getElementById('qty').max = opt.dataset.stock;
+        document.getElementById('qty').max   = opt.dataset.stock;
         document.getElementById('qty').value = 1;
     }
 }
@@ -174,35 +192,40 @@ function addToCart() {
     const price = parseFloat(document.getElementById('unitaryPrice').value);
     const qty   = parseInt(document.getElementById('qty').value);
 
-    let sel, productId, productName;
-    if (type === 'vehicle') {
-        sel = document.getElementById('vehicleSelect');
-    } else if (type === 'spares') {
-        sel = document.getElementById('spareSelect');
-    } else {
-        alert('Selecciona el tipo de producto.'); return;
-    }
+    let sel;
+    if      (type === 'vehicle') sel = document.getElementById('vehicleSelect');
+    else if (type === 'spares')  sel = document.getElementById('spareSelect');
+    else { alert('Selecciona el tipo de producto.'); return; }
 
     const opt = sel.options[sel.selectedIndex];
-    if (!opt || !opt.value) { alert('Selecciona un producto.'); return; }
-    if (!price || price <= 0) { alert('Ingresa un precio válido.'); return; }
-    if (!qty   || qty <= 0)  { alert('Ingresa una cantidad válida.'); return; }
+    if (!opt || !opt.value)           { alert('Selecciona un producto.'); return; }
+    if (!price || price <= 0)         { alert('El precio no es válido.'); return; }
+    if (!qty   || qty <= 0)           { alert('La cantidad no es válida.'); return; }
     if (opt.dataset.stock && qty > parseInt(opt.dataset.stock)) {
         alert('La cantidad supera el stock disponible (' + opt.dataset.stock + ' uds.).'); return;
     }
 
-    productId   = opt.value;
-    productName = opt.dataset.name || opt.text;
-
-    const item = { type, productId, productName, qty, price, subtotal: price * qty };
-    cart.push(item);
-    renderCart();
-
-    // Reset selector side
+    pushCart(type, opt.value, opt.dataset.name || opt.text, qty, price);
     sel.value = '';
     document.getElementById('unitaryPrice').value = '';
     document.getElementById('qty').value = 1;
     document.getElementById('qty').removeAttribute('max');
+}
+
+function addExtra() {
+    const name  = document.getElementById('extraName').value.trim();
+    const price = parseFloat(document.getElementById('extraPrice').value);
+    if (!name)            { alert('Ingresa una descripción para el cobro extra.'); return; }
+    if (!price || price <= 0) { alert('Ingresa un valor válido para el cobro extra.'); return; }
+
+    pushCart('extra', '0', name, 1, price);
+    document.getElementById('extraName').value  = '';
+    document.getElementById('extraPrice').value = '';
+}
+
+function pushCart(type, productId, productName, qty, price) {
+    cart.push({ type, productId, productName, qty, price, subtotal: price * qty });
+    renderCart();
 }
 
 function removeFromCart(idx) {
@@ -217,7 +240,7 @@ function renderCart() {
     hidden.innerHTML = '';
 
     if (cart.length === 0) {
-        tbody.innerHTML = '<tr id="emptyRow"><td colspan="6" class="text-center text-muted py-4"><i class="fas fa-cart-arrow-down me-1"></i>Agrega productos al carrito</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4"><i class="fas fa-cart-arrow-down me-1"></i>Agrega productos al carrito</td></tr>';
         document.getElementById('totalDisplay').textContent = '$0';
         document.getElementById('submitBtn').disabled = true;
         return;
@@ -226,9 +249,10 @@ function renderCart() {
     let total = 0;
     cart.forEach((item, i) => {
         total += item.subtotal;
-        const typeLabel = item.type === 'vehicle'
-            ? '<span class="badge bg-primary-subtle text-primary">Vehículo</span>'
-            : '<span class="badge bg-warning-subtle text-warning-emphasis">Repuesto</span>';
+        let typeLabel;
+        if      (item.type === 'vehicle') typeLabel = '<span class="badge bg-primary-subtle text-primary">Vehículo</span>';
+        else if (item.type === 'spares')  typeLabel = '<span class="badge bg-warning-subtle text-warning-emphasis">Repuesto</span>';
+        else                              typeLabel = '<span class="badge bg-secondary-subtle text-secondary">Extra</span>';
 
         tbody.innerHTML += `
             <tr>

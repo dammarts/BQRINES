@@ -27,7 +27,7 @@ public class SellService {
                 inventoryService.discountVehicleStock(item.getProductId(), item.getQuantity());
             } else if ("spares".equalsIgnoreCase(item.getProductType())) {
                 inventoryService.discountSpareStock(item.getProductId(), item.getQuantity());
-            } else {
+            } else if (!"extra".equalsIgnoreCase(item.getProductType())) {
                 throw new RuntimeException("Unknown product type: " + item.getProductType());
             }
             item.setSubtotal(item.getUnitaryPrice() * item.getQuantity());
