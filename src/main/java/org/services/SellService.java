@@ -1,6 +1,7 @@
 package org.services;
 
 import org.models.Sell;
+import org.models.SellItem;
 import org.repositories.SellRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,19 +19,21 @@ public class SellService {
     @Autowired
     private InventoryService inventoryService;
 
-    // Atomic operation: persists the sale AND discounts stock in a single transaction.
-    // If stock discount fails (StockInsuficienteException), the entire transaction rolls back.
     @Transactional
     public Sell registerSell(Sell sell) {
-        if (sell.getProductType().equalsIgnoreCase("vehicle")) {
-            inventoryService.discountVehicleStock(sell.getProductId(), sell.getQuantity());
-        } else if (sell.getProductType().equalsIgnoreCase("spares")) {
-            inventoryService.discountSpareStock(sell.getProductId(), sell.getQuantity());
-        } else {
-            throw new RuntimeException("Unknown product type: " + sell.getProductType());
+        double total = 0;
+        for (SellItem item : sell.getItems()) {
+            if ("vehicle".equalsIgnoreCase(item.getProductType())) {
+                inventoryService.discountVehicleStock(item.getProductId(), item.getQuantity());
+            } else if ("spares".equalsIgnoreCase(item.getProductType())) {
+                inventoryService.discountSpareStock(item.getProductId(), item.getQuantity());
+            } else if (!"extra".equalsIgnoreCase(item.getProductType())) {
+                throw new RuntimeException("Unknown product type: " + item.getProductType());
+            }
+            item.setSubtotal(item.getUnitaryPrice() * item.getQuantity());
+            total += item.getSubtotal();
         }
-
-        sell.setTotal(sell.getUnitaryPrice() * sell.getQuantity());
+        sell.setTotal(total);
         return sellRepository.save(sell);
     }
 

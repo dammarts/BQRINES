@@ -76,6 +76,18 @@ public class UserService implements UserDetailsService {
         userRepository.delete(findById(id));
     }
 
+    @Transactional
+    public boolean changePassword(String email, String currentRaw, String newRaw) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+        if (!passwordEncoder.matches(currentRaw, user.getPassword())) {
+            return false;
+        }
+        user.setPassword(passwordEncoder.encode(newRaw));
+        userRepository.save(user);
+        return true;
+    }
+
     @Transactional(readOnly = true)
     public List<User> findByRol(Rol rol) {
         return userRepository.findAll().stream()

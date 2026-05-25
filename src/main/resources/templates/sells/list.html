@@ -34,10 +34,7 @@
                         <th>#</th>
                         <th>Fecha</th>
                         <th>Cliente</th>
-                        <th>Producto</th>
-                        <th>Tipo</th>
-                        <th>Cantidad</th>
-                        <th>Precio Unit.</th>
+                        <th>Productos</th>
                         <th>Total</th>
                         <th>Registrado por</th>
                         <th>Ticket</th>
@@ -45,7 +42,7 @@
                 </thead>
                 <tbody>
                     <tr th:if="${#lists.isEmpty(sells)}">
-                        <td colspan="10" class="text-center text-muted py-5">
+                        <td colspan="7" class="text-center text-muted py-5">
                             <i class="fas fa-receipt fa-2x mb-2 d-block opacity-25"></i>
                             No hay ventas registradas.
                         </td>
@@ -54,13 +51,11 @@
                         <td class="text-muted small" th:text="${s.id}"></td>
                         <td class="small" th:text="${#temporals.format(s.date, 'dd/MM/yyyy HH:mm')}"></td>
                         <td class="fw-semibold" th:text="${s.clientName}"></td>
-                        <td th:text="${s.productName}"></td>
                         <td>
-                            <span th:if="${s.productType == 'vehicle'}" class="badge bg-primary-subtle text-primary">Vehículo</span>
-                            <span th:if="${s.productType == 'spares'}" class="badge bg-warning-subtle text-warning-emphasis">Repuesto</span>
+                            <span th:if="${#lists.isEmpty(s.items)}" class="text-muted small">—</span>
+                            <span th:unless="${#lists.isEmpty(s.items)}"
+                                  th:text="${#lists.size(s.items)} + ' producto(s)'"></span>
                         </td>
-                        <td th:text="${s.quantity}"></td>
-                        <td th:text="'$' + ${#numbers.formatDecimal(s.unitaryPrice, 0, 'COMMA', 0, 'POINT')}"></td>
                         <td class="fw-semibold" th:text="'$' + ${#numbers.formatDecimal(s.total, 0, 'COMMA', 0, 'POINT')}"></td>
                         <td class="small text-muted" th:text="${s.registeredBy}"></td>
                         <td>

@@ -36,12 +36,15 @@
                 <thead>
                     <tr>
                         <th>#</th>
+                        <th>Placa</th>
                         <th>Marca</th>
                         <th>Modelo</th>
                         <th>Año</th>
+                        <th>Color</th>
                         <th>Precio</th>
                         <th>Stock</th>
                         <th>Estado</th>
+                        <th>Registrado</th>
                         <th sec:authorize="hasRole('GERENTE')">Acciones</th>
                     </tr>
                 </thead>
@@ -54,9 +57,11 @@
                     </tr>
                     <tr th:each="v : ${vehicles}">
                         <td class="text-muted small" th:text="${v.id}"></td>
+                        <td><code th:text="${v.placa != null} ? ${v.placa} : '—'"></code></td>
                         <td class="fw-semibold" th:text="${v.brand}"></td>
                         <td th:text="${v.model}"></td>
                         <td th:text="${v.year}"></td>
+                        <td th:text="${v.color != null} ? ${v.color} : '—'"></td>
                         <td th:text="'$' + ${#numbers.formatDecimal(v.price, 0, 'COMMA', 0, 'POINT')}"></td>
                         <td>
                             <span th:if="${v.stock == 0}" class="stock-off" th:text="${v.stock} + ' uds.'"></span>
@@ -66,6 +71,17 @@
                         <td>
                             <span th:if="${v.active}" class="badge bg-success-subtle text-success">Activo</span>
                             <span th:unless="${v.active}" class="badge bg-danger-subtle text-danger">Inactivo</span>
+                        </td>
+                        <td class="small text-muted">
+                            <span th:if="${v.createdAt != null}"
+                                  th:title="${v.updatedAt != null ? 'Editado: ' + #temporals.format(v.updatedAt, 'dd/MM/yyyy HH:mm') + (v.modifiedBy != null ? ' por ' + v.modifiedBy : '') : 'Sin ediciones'}"
+                                  th:text="${#temporals.format(v.createdAt, 'dd/MM/yyyy HH:mm')}"
+                                  style="cursor:default;" data-bs-toggle="tooltip"></span>
+                            <span th:if="${v.createdAt == null and v.updatedAt != null}"
+                                  th:title="'Editado: ' + ${#temporals.format(v.updatedAt, 'dd/MM/yyyy HH:mm')} + ${v.modifiedBy != null ? ' por ' + v.modifiedBy : ''}"
+                                  th:text="'Act. ' + ${#temporals.format(v.updatedAt, 'dd/MM/yyyy HH:mm')}"
+                                  style="cursor:default;" data-bs-toggle="tooltip"></span>
+                            <span th:if="${v.createdAt == null and v.updatedAt == null}">—</span>
                         </td>
                         <td sec:authorize="hasRole('GERENTE')">
                             <a th:href="@{/inventory/vehicles/edit/{id}(id=${v.id})}"
@@ -87,5 +103,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));</script>
 </body>
 </html>

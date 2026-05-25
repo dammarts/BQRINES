@@ -14,6 +14,15 @@
 
 <div class="main-content container-fluid">
 
+    <div th:if="${warning}" class="alert alert-warning alert-dismissible fade show mb-3" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i><span th:text="${warning}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+        <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
     <div class="page-header">
         <h2>
             <i class="fas fa-car me-2"></i>
@@ -29,27 +38,38 @@
               th:object="${vehicle}" method="post">
 
             <div class="row g-3">
-                <div class="col-md-6">
+                <div class="col-md-4">
+                    <label class="form-label">Placa</label>
+                    <input type="text" th:field="*{placa}" class="form-control"
+                           placeholder="ABC-123" maxlength="20"
+                           style="text-transform:uppercase">
+                </div>
+                <div class="col-md-5">
                     <label class="form-label">Marca</label>
                     <input type="text" th:field="*{brand}" class="form-control"
                            placeholder="Toyota" required maxlength="100">
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-3">
                     <label class="form-label">Modelo</label>
                     <input type="text" th:field="*{model}" class="form-control"
                            placeholder="Corolla" required maxlength="100">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label">Año</label>
                     <input type="number" th:field="*{year}" class="form-control"
                            placeholder="2024" min="1900" max="2100" required>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <label class="form-label">Color</label>
+                    <input type="text" th:field="*{color}" class="form-control"
+                           placeholder="Blanco" maxlength="50">
+                </div>
+                <div class="col-md-3">
                     <label class="form-label">Precio ($)</label>
                     <input type="number" th:field="*{price}" class="form-control"
                            placeholder="25000" min="0" step="0.01" required>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label">Stock</label>
                     <input type="number" th:field="*{stock}" class="form-control"
                            placeholder="1" min="0" required>

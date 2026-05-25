@@ -26,14 +26,24 @@ public class DataInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        // Fix stale records: stock=0 but still marked active (data from before the auto-deactivation fix)
-        spareRepository.findAll().stream()
-                .filter(s -> s.getStock() <= 0 && s.isActive())
-                .forEach(s -> { s.setStock(0); s.setActive(false); spareRepository.save(s); });
+        // Sync active flag with actual stock on every startup
+        spareRepository.findAll().forEach(s -> {
+            boolean shouldBeActive = s.getStock() != null && s.getStock() > 0;
+            if (s.isActive() != shouldBeActive) {
+                s.setActive(shouldBeActive);
+                if (!shouldBeActive) s.setStock(0);
+                spareRepository.save(s);
+            }
+        });
 
-        vehicleRepository.findAll().stream()
-                .filter(v -> v.getStock() <= 0 && v.isActive())
-                .forEach(v -> { v.setStock(0); v.setActive(false); vehicleRepository.save(v); });
+        vehicleRepository.findAll().forEach(v -> {
+            boolean shouldBeActive = v.getStock() != null && v.getStock() > 0;
+            if (v.isActive() != shouldBeActive) {
+                v.setActive(shouldBeActive);
+                if (!shouldBeActive) v.setStock(0);
+                vehicleRepository.save(v);
+            }
+        });
 
         if (userRepository.count() > 0) return;
 

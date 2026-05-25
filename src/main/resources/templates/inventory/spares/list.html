@@ -43,6 +43,7 @@
                         <th>Precio</th>
                         <th>Stock</th>
                         <th>Estado</th>
+                        <th>Registrado</th>
                         <th sec:authorize="hasAnyRole('GERENTE','ASESOR_COMERCIAL')">Acciones</th>
                     </tr>
                 </thead>
@@ -68,6 +69,17 @@
                             <span th:if="${s.active}" class="badge bg-success-subtle text-success">Activo</span>
                             <span th:unless="${s.active}" class="badge bg-danger-subtle text-danger">Inactivo</span>
                         </td>
+                        <td class="small text-muted">
+                            <span th:if="${s.createdAt != null}"
+                                  th:title="${s.updatedAt != null ? 'Editado: ' + #temporals.format(s.updatedAt, 'dd/MM/yyyy HH:mm') + (s.modifiedBy != null ? ' por ' + s.modifiedBy : '') : 'Sin ediciones'}"
+                                  th:text="${#temporals.format(s.createdAt, 'dd/MM/yyyy HH:mm')}"
+                                  style="cursor:default;" data-bs-toggle="tooltip"></span>
+                            <span th:if="${s.createdAt == null and s.updatedAt != null}"
+                                  th:title="'Editado: ' + ${#temporals.format(s.updatedAt, 'dd/MM/yyyy HH:mm')} + ${s.modifiedBy != null ? ' por ' + s.modifiedBy : ''}"
+                                  th:text="'Act. ' + ${#temporals.format(s.updatedAt, 'dd/MM/yyyy HH:mm')}"
+                                  style="cursor:default;" data-bs-toggle="tooltip"></span>
+                            <span th:if="${s.createdAt == null and s.updatedAt == null}">—</span>
+                        </td>
                         <td sec:authorize="hasAnyRole('GERENTE','ASESOR_COMERCIAL')">
                             <a th:href="@{/inventory/spares/edit/{id}(id=${s.id})}"
                                class="btn btn-sm btn-outline-primary me-1">
@@ -89,5 +101,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));</script>
 </body>
 </html>

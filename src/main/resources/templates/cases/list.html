@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casos de Servicio | BQRINES</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="main-content container-fluid">
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+        <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="page-header">
+        <h2><i class="fas fa-clipboard-list me-2"></i>Casos de Servicio</h2>
+        <a sec:authorize="hasRole('SERVICIO_TECNICO')"
+           th:href="@{/clients}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Nuevo Caso
+        </a>
+    </div>
+
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Placa</th>
+                        <th>Cliente</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                        <th>Repuestos</th>
+                        <th>Creado por</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(cases)}">
+                        <td colspan="9" class="text-center text-muted py-5">
+                            <i class="fas fa-clipboard fa-2x mb-2 d-block opacity-25"></i>
+                            No hay casos registrados.
+                        </td>
+                    </tr>
+                    <tr th:each="sc : ${cases}">
+                        <td class="text-muted small" th:text="${sc.id}"></td>
+                        <td>
+                            <span class="badge bg-dark fs-6"
+                                  th:text="${sc.serviceVehicle.placa}"></span>
+                        </td>
+                        <td th:text="${sc.serviceVehicle.client.name}"></td>
+                        <td class="text-muted small"
+                            th:text="${#strings.abbreviate(sc.description ?: '-', 60)}"></td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${sc.status.name() == 'RECIBIDO'} ? 'bg-secondary'
+                                              : (${sc.status.name() == 'EN_DIAGNOSTICO'} ? 'bg-info text-dark'
+                                              : (${sc.status.name() == 'ESPERANDO_REPUESTOS'} ? 'bg-warning text-dark'
+                                              : (${sc.status.name() == 'EN_REPARACION'} ? 'bg-primary'
+                                              : (${sc.status.name() == 'LISTO'} ? 'bg-success'
+                                              : 'bg-dark'))))"
+                                  th:text="${sc.status.name().replace('_',' ')}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${#lists.size(sc.items)}" class="fw-semibold"></span>
+                            <span class="text-muted small"> repuestos</span>
+                        </td>
+                        <td class="text-muted small" th:text="${sc.createdBy}"></td>
+                        <td class="text-muted small"
+                            th:text="${#temporals.format(sc.createdAt, 'dd/MM/yy HH:mm')}"></td>
+                        <td>
+                            <a th:href="@{/cases/{id}(id=${sc.id})}"
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye me-1"></i>Ver
+                            </a>
+                            <a sec:authorize="hasRole('ASESOR_COMERCIAL')"
+                               th:if="${sc.status.name() == 'LISTO' and sc.sellId == null}"
+                               th:href="@{/cases/{id}/close(id=${sc.id})}"
+                               class="btn btn-sm btn-success ms-1">
+                                <i class="fas fa-cash-register me-1"></i>Cerrar
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

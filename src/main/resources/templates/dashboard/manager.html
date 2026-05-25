@@ -71,6 +71,32 @@
                 </div>
             </a>
         </div>
+        <div class="col-sm-6 col-lg-3">
+            <a th:href="@{/service-requests}" class="text-decoration-none">
+                <div class="stat-card stat-card-link" style="--bs-card-color:#6f42c1;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-number" th:text="${openRequests}">0</div>
+                            <div class="stat-label">Solicitudes abiertas</div>
+                        </div>
+                        <i class="fas fa-tools stat-icon"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <a th:href="@{/cases}" class="text-decoration-none">
+                <div class="stat-card stat-card-link" style="background:linear-gradient(135deg,#0d6efd 0%,#0dcaf0 100%);">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-number" th:text="${openCases}">0</div>
+                            <div class="stat-label">Casos activos</div>
+                        </div>
+                        <i class="fas fa-clipboard-list stat-icon"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
     </div>
 
     <!-- Alerts section -->
@@ -79,12 +105,13 @@
             <div class="alert-banner">
                 <div class="fw-semibold mb-2">
                     <i class="fas fa-bell me-2 text-warning"></i>
-                    Productos con stock bajo (≤ 3 unidades)
+                    Repuestos con stock bajo o agotado
                 </div>
                 <ul class="list-unstyled mb-0">
                     <li th:each="s : ${spareAlerts}" class="d-flex justify-content-between py-1 border-bottom border-warning-subtle">
                         <span th:text="${s.name + ' (' + s.reference + ')'}"></span>
-                        <span class="stock-low ms-2" th:text="${s.stock} + ' uds.'"></span>
+                        <span th:if="${s.stock == 0}" class="stock-off ms-2">0 uds.</span>
+                        <span th:if="${s.stock > 0}" class="stock-low ms-2" th:text="${s.stock} + ' uds.'"></span>
                     </li>
                 </ul>
             </div>

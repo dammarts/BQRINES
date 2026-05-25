@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial | BQRINES</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="main-content container-fluid">
+
+    <div class="page-header">
+        <h2><i class="fas fa-history me-2"></i>Historial de Cambios</h2>
+    </div>
+
+    <!-- Type tabs -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link"
+               th:classappend="${activeType == 'VEHICULO'} ? ' active'"
+               th:href="@{/history(type='VEHICULO')}">
+                <i class="fas fa-car me-1"></i>Vehículos
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               th:classappend="${activeType == 'REPUESTO'} ? ' active'"
+               th:href="@{/history(type='REPUESTO')}">
+                <i class="fas fa-cog me-1"></i>Repuestos
+            </a>
+        </li>
+    </ul>
+
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th style="width:140px;">Fecha y hora</th>
+                        <th style="width:90px;">Acción</th>
+                        <th>Ítem</th>
+                        <th>Detalle del cambio</th>
+                        <th style="width:160px;">Realizado por</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(logs)}">
+                        <td colspan="5" class="text-center text-muted py-5">
+                            <i class="fas fa-history fa-2x mb-2 d-block opacity-25"></i>
+                            No hay registros de cambios aún.
+                        </td>
+                    </tr>
+                    <tr th:each="log : ${logs}">
+                        <td class="small text-muted text-nowrap"
+                            th:text="${#temporals.format(log.performedAt, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                        <td>
+                            <span th:if="${log.action.name() == 'CREAR'}"
+                                  class="badge bg-success-subtle text-success">
+                                <i class="fas fa-plus me-1"></i>Crear
+                            </span>
+                            <span th:if="${log.action.name() == 'EDITAR'}"
+                                  class="badge bg-warning-subtle text-warning-emphasis">
+                                <i class="fas fa-pen me-1"></i>Editar
+                            </span>
+                            <span th:if="${log.action.name() == 'ELIMINAR'}"
+                                  class="badge bg-danger-subtle text-danger">
+                                <i class="fas fa-trash me-1"></i>Eliminar
+                            </span>
+                        </td>
+                        <td class="fw-semibold" th:text="${log.entityDescription}"></td>
+                        <td class="small text-muted" th:text="${log.details != null ? log.details : '—'}"></td>
+                        <td class="small text-muted" th:text="${log.performedBy}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

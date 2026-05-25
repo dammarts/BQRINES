@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitudes Técnicas | BQRINES</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="main-content container-fluid">
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+        <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="page-header">
+        <h2><i class="fas fa-tools me-2"></i>Solicitudes de Servicio Técnico</h2>
+        <a sec:authorize="hasRole('SERVICIO_TECNICO')"
+           th:href="@{/service-requests/new}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Nueva Solicitud
+        </a>
+    </div>
+
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Título</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                        <th th:if="${isGerente}">Solicitado por</th>
+                        <th>Fecha</th>
+                        <th>Observaciones</th>
+                        <th sec:authorize="hasRole('GERENTE')">Gestionar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(requests)}">
+                        <td colspan="8" class="text-center text-muted py-5">
+                            <i class="fas fa-tools fa-2x mb-2 d-block opacity-25"></i>
+                            No hay solicitudes registradas.
+                        </td>
+                    </tr>
+                    <tr th:each="r : ${requests}">
+                        <td class="text-muted small" th:text="${r.id}"></td>
+                        <td class="fw-semibold" th:text="${r.title}"></td>
+                        <td class="small text-muted" th:text="${r.description != null ? r.description : '—'}"></td>
+                        <td>
+                            <span th:if="${r.status.name() == 'ABIERTA'}"
+                                  class="badge bg-danger-subtle text-danger">Abierta</span>
+                            <span th:if="${r.status.name() == 'EN_PROCESO'}"
+                                  class="badge bg-warning-subtle text-warning-emphasis">En proceso</span>
+                            <span th:if="${r.status.name() == 'CERRADA'}"
+                                  class="badge bg-success-subtle text-success">Cerrada</span>
+                        </td>
+                        <td th:if="${isGerente}" class="small text-muted" th:text="${r.requestedBy}"></td>
+                        <td class="small text-muted"
+                            th:text="${r.createdAt != null ? #temporals.format(r.createdAt, 'dd/MM/yyyy HH:mm') : '—'}"></td>
+                        <td class="small text-muted" th:text="${r.notes != null ? r.notes : '—'}"></td>
+                        <td sec:authorize="hasRole('GERENTE')">
+                            <a th:href="@{/service-requests/manage/{id}(id=${r.id})}"
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

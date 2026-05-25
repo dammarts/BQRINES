@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Solicitud | BQRINES</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="main-content container-fluid">
+
+    <div class="page-header">
+        <h2><i class="fas fa-tools me-2"></i>Gestionar Solicitud #<span th:text="${request.id}"></span></h2>
+        <a th:href="@{/service-requests}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Volver
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <!-- Request detail -->
+            <div class="form-card mb-3">
+                <p class="text-muted small text-uppercase fw-semibold mb-2" style="letter-spacing:.4px;">Detalle de la solicitud</p>
+                <div class="mb-2">
+                    <span class="text-muted small">Título</span>
+                    <p class="fw-semibold mb-0" th:text="${request.title}"></p>
+                </div>
+                <div class="mb-2" th:if="${request.description != null}">
+                    <span class="text-muted small">Descripción</span>
+                    <p class="mb-0" th:text="${request.description}"></p>
+                </div>
+                <div class="mb-2">
+                    <span class="text-muted small">Solicitado por</span>
+                    <p class="mb-0" th:text="${request.requestedBy}"></p>
+                </div>
+                <div>
+                    <span class="text-muted small">Fecha de solicitud</span>
+                    <p class="mb-0" th:text="${request.createdAt != null ? #temporals.format(request.createdAt, 'dd/MM/yyyy HH:mm') : '—'}"></p>
+                </div>
+            </div>
+
+            <!-- Management form -->
+            <div class="form-card">
+                <p class="text-muted small text-uppercase fw-semibold mb-3" style="letter-spacing:.4px;">Actualizar estado</p>
+                <form th:action="@{/service-requests/manage/{id}(id=${request.id})}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Estado</label>
+                        <select name="status" class="form-select" required>
+                            <option th:each="s : ${statuses}"
+                                    th:value="${s.name()}"
+                                    th:text="${s.name() == 'ABIERTA' ? 'Abierta' : s.name() == 'EN_PROCESO' ? 'En proceso' : 'Cerrada'}"
+                                    th:selected="${s == request.status}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Observaciones</label>
+                        <textarea name="notes" class="form-control" rows="3"
+                                  placeholder="Notas o comentarios sobre la solicitud..."
+                                  maxlength="500" th:text="${request.notes}"></textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-save me-2"></i>Guardar cambios
+                        </button>
+                        <a th:href="@{/service-requests}" class="btn btn-outline-secondary px-4">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

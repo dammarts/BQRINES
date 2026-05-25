@@ -27,7 +27,7 @@
                         <i class="fas fa-boxes me-1"></i> Inventario
                     </a>
                     <ul class="dropdown-menu">
-                        <li>
+                        <li sec:authorize="hasAnyRole('GERENTE','ASESOR_COMERCIAL')">
                             <a class="dropdown-item" th:href="@{/inventory/vehicles}">
                                 <i class="fas fa-car me-1"></i> Vehículos
                             </a>
@@ -40,9 +40,15 @@
                     </ul>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="hasAnyRole('GERENTE','ASESOR_COMERCIAL')">
                     <a class="nav-link" th:href="@{/sells}">
                         <i class="fas fa-receipt me-1"></i> Ventas
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasRole('GERENTE')">
+                    <a class="nav-link" th:href="@{/history}">
+                        <i class="fas fa-history me-1"></i> Historial
                     </a>
                 </li>
 
@@ -65,6 +71,24 @@
                     </a>
                 </li>
 
+                <li class="nav-item" sec:authorize="hasAnyRole('GERENTE','SERVICIO_TECNICO')">
+                    <a class="nav-link" th:href="@{/service-requests}">
+                        <i class="fas fa-tools me-1"></i> Solicitudes
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('GERENTE','SERVICIO_TECNICO')">
+                    <a class="nav-link" th:href="@{/clients}">
+                        <i class="fas fa-users me-1"></i> Clientes
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('GERENTE','ASESOR_COMERCIAL','SERVICIO_TECNICO')">
+                    <a class="nav-link" th:href="@{/cases}">
+                        <i class="fas fa-clipboard-list me-1"></i> Casos
+                    </a>
+                </li>
+
             </ul>
 
             <div class="d-flex align-items-center gap-3">
@@ -72,6 +96,9 @@
                     <i class="fas fa-user-circle me-1"></i>
                     <sec:authentication property="name"/>
                 </span>
+                <a th:href="@{/profile/password}" class="btn btn-sm btn-outline-light px-3">
+                    <i class="fas fa-key me-1"></i> Contraseña
+                </a>
                 <form th:action="@{/logout}" method="post" class="m-0">
                     <button type="submit" class="btn btn-sm btn-outline-light px-3">
                         <i class="fas fa-sign-out-alt me-1"></i> Salir

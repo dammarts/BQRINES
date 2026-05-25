@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Caso | BQRINES</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="main-content container" style="max-width:700px;">
+
+    <div class="page-header">
+        <h2><i class="fas fa-tools me-2"></i>Crear Caso de Servicio</h2>
+        <a th:href="@{/clients}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Volver
+        </a>
+    </div>
+
+    <!-- Step 1: Search by placa -->
+    <div th:if="${vehicle == null}" class="card p-4 mb-4">
+        <h5 class="mb-3">Buscar vehículo por placa</h5>
+        <form th:action="@{/cases/new}" method="get" class="row g-2 align-items-end">
+            <div class="col">
+                <input type="text" name="placa" class="form-control text-uppercase"
+                       placeholder="Ej: ABC123" th:value="${placa}" required>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search me-1"></i>Buscar
+                </button>
+            </div>
+        </form>
+
+        <div th:if="${vehicleNotFound}" class="alert alert-warning mt-3">
+            <i class="fas fa-exclamation-triangle me-1"></i>
+            No se encontró vehículo con placa <strong th:text="${placa}"></strong>.
+            <a th:href="@{/clients/new-vehicle}" class="alert-link ms-1">Registrar nuevo vehículo</a>
+        </div>
+    </div>
+
+    <!-- Step 2: Vehicle found — create case -->
+    <div th:if="${vehicle != null}">
+        <div class="card p-4 mb-4 border-success">
+            <h6 class="text-success mb-3"><i class="fas fa-check-circle me-1"></i>Vehículo encontrado</h6>
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <span class="badge bg-dark fs-5" th:text="${vehicle.placa}"></span>
+                </div>
+                <div class="col-md-3 text-muted small">
+                    <strong>Marca:</strong> <span th:text="${vehicle.brand}"></span>
+                </div>
+                <div class="col-md-3 text-muted small">
+                    <strong>Modelo:</strong> <span th:text="${vehicle.model}"></span>
+                </div>
+                <div class="col-md-3 text-muted small">
+                    <strong>Año:</strong> <span th:text="${vehicle.year}"></span>
+                </div>
+                <div class="col-12 text-muted small">
+                    <strong>Cliente:</strong>
+                    <span th:text="${client.name}"></span>
+                    <span th:if="${client.phone}" th:text="${' · ' + client.phone}"></span>
+                </div>
+            </div>
+        </div>
+
+        <form th:action="@{/cases/create}" method="post" class="card p-4">
+            <input type="hidden" name="vehicleId" th:value="${vehicle.id}">
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Descripción del problema</label>
+                <textarea name="description" class="form-control" rows="4"
+                          placeholder="Describe el problema reportado por el cliente..."></textarea>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-clipboard-check me-1"></i>Crear Caso
+                </button>
+                <a th:href="@{/clients}" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

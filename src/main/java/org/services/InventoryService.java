@@ -3,13 +3,16 @@ package org.services;
 import org.exception.InsufficientStockException;
 import org.models.Spare;
 import org.models.Vehicle;
+import org.models.enums.AuditAction;
 import org.repositories.SpareRepository;
 import org.repositories.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class InventoryService {
@@ -21,6 +24,9 @@ public class InventoryService {
 
     @Autowired
     private SpareRepository spareRepository;
+
+    @Autowired
+    private AuditLogService auditLogService;
 
     // ── Vehicle ───────────────────────────────────────────────────────────────
 
@@ -40,25 +46,72 @@ public class InventoryService {
                 .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + id));
     }
 
-    @Transactional
-    public Vehicle saveVehicle(Vehicle vehicle) {
-        return vehicleRepository.save(vehicle);
+    @Transactional(readOnly = true)
+    public java.util.Optional<Vehicle> findVehicleByPlaca(String placa) {
+        return vehicleRepository.findByPlaca(placa);
     }
 
     @Transactional
-    public Vehicle updateVehicle(Long id, Vehicle data) {
+    public Vehicle saveVehicle(Vehicle vehicle, String performedBy) {
+        Vehicle saved = vehicleRepository.save(vehicle);
+        String details = "Placa: " + nvl(saved.getPlaca())
+                + " | Marca: " + saved.getBrand()
+                + " | Modelo: " + saved.getModel()
+                + " | Año: " + saved.getYear()
+                + " | Color: " + nvl(saved.getColor())
+                + " | Precio: $" + fmt(saved.getPrice())
+                + " | Stock: " + saved.getStock();
+        auditLogService.log("VEHICULO", saved.getId(), vehicleDesc(saved), AuditAction.CREAR, details, performedBy);
+        return saved;
+    }
+
+    @Transactional
+    public Vehicle updateVehicle(Long id, Vehicle data, String modifiedBy) {
         Vehicle existing = findVehicleById(id);
+
+        List<String> changes = new ArrayList<>();
+        if (!eq(existing.getPlaca(), data.getPlaca()))
+            changes.add("Placa: " + nvl(existing.getPlaca()) + " → " + nvl(data.getPlaca()));
+        if (!eq(existing.getBrand(), data.getBrand()))
+            changes.add("Marca: " + existing.getBrand() + " → " + data.getBrand());
+        if (!eq(existing.getModel(), data.getModel()))
+            changes.add("Modelo: " + existing.getModel() + " → " + data.getModel());
+        if (!eq(existing.getYear(), data.getYear()))
+            changes.add("Año: " + existing.getYear() + " → " + data.getYear());
+        if (!eq(existing.getColor(), data.getColor()))
+            changes.add("Color: " + nvl(existing.getColor()) + " → " + nvl(data.getColor()));
+        if (!eq(existing.getPrice(), data.getPrice()))
+            changes.add("Precio: $" + fmt(existing.getPrice()) + " → $" + fmt(data.getPrice()));
+        if (!eq(existing.getStock(), data.getStock()))
+            changes.add("Stock: " + existing.getStock() + " → " + data.getStock());
+
+        existing.setPlaca(data.getPlaca());
+        existing.setColor(data.getColor());
         existing.setBrand(data.getBrand());
         existing.setModel(data.getModel());
         existing.setYear(data.getYear());
         existing.setPrice(data.getPrice());
         existing.setStock(data.getStock());
-        return vehicleRepository.save(existing);
+        if (data.getStock() != null && data.getStock() > 0) existing.setActive(true);
+        existing.setModifiedBy(modifiedBy);
+        Vehicle saved = vehicleRepository.save(existing);
+
+        String details = changes.isEmpty() ? "Sin cambios detectados" : String.join(" | ", changes);
+        auditLogService.log("VEHICULO", saved.getId(), vehicleDesc(saved), AuditAction.EDITAR, details, modifiedBy);
+        return saved;
     }
 
     @Transactional
-    public void deleteVehicle(Long id) {
-        vehicleRepository.delete(findVehicleById(id));
+    public void deleteVehicle(Long id, String deletedBy) {
+        Vehicle v = findVehicleById(id);
+        String desc = vehicleDesc(v);
+        int stockAtDelete = v.getStock();
+        v.setDeletedAt(java.time.LocalDateTime.now());
+        v.setActive(false);
+        v.setDeletedBy(deletedBy);
+        vehicleRepository.save(v);
+        auditLogService.log("VEHICULO", v.getId(), desc, AuditAction.ELIMINAR,
+                "Stock al eliminar: " + stockAtDelete, deletedBy);
     }
 
     @Transactional
@@ -66,11 +119,13 @@ public class InventoryService {
         Vehicle vehicle = findVehicleById(id);
         if (vehicle.getStock() < quantity) {
             throw new InsufficientStockException(
-                    "Insufficient stock for vehicle: " + vehicle.getBrand() + " " + vehicle.getModel()
-            );
+                    "Insufficient stock for vehicle: " + vehicle.getBrand() + " " + vehicle.getModel());
         }
-        vehicle.setStock(vehicle.getStock() - quantity);
+        int before = vehicle.getStock();
+        vehicle.setStock(before - quantity);
         vehicleRepository.save(vehicle);
+        auditLogService.log("VEHICULO", vehicle.getId(), vehicleDesc(vehicle), AuditAction.EDITAR,
+                "Stock por venta: " + before + " → " + vehicle.getStock(), "sistema");
     }
 
     // ── Spare ─────────────────────────────────────────────────────────────────
@@ -97,27 +152,58 @@ public class InventoryService {
     }
 
     @Transactional
-    public Spare saveSpare(Spare spare) {
-        return spareRepository.save(spare);
+    public Spare saveSpare(Spare spare, String performedBy) {
+        Spare saved = spareRepository.save(spare);
+        String details = "Nombre: " + saved.getName()
+                + " | Referencia: " + saved.getReference()
+                + " | Categoría: " + saved.getCategory()
+                + " | Precio: $" + fmt(saved.getPrice())
+                + " | Stock: " + saved.getStock();
+        auditLogService.log("REPUESTO", saved.getId(), spareDesc(saved), AuditAction.CREAR, details, performedBy);
+        return saved;
     }
 
     @Transactional
-    public Spare updateSpare(Long id, Spare data) {
+    public Spare updateSpare(Long id, Spare data, String modifiedBy) {
         Spare existing = findSpareById(id);
+
+        List<String> changes = new ArrayList<>();
+        if (!eq(existing.getName(), data.getName()))
+            changes.add("Nombre: " + existing.getName() + " → " + data.getName());
+        if (!eq(existing.getReference(), data.getReference()))
+            changes.add("Referencia: " + existing.getReference() + " → " + data.getReference());
+        if (!eq(existing.getCategory(), data.getCategory()))
+            changes.add("Categoría: " + existing.getCategory() + " → " + data.getCategory());
+        if (!eq(existing.getPrice(), data.getPrice()))
+            changes.add("Precio: $" + fmt(existing.getPrice()) + " → $" + fmt(data.getPrice()));
+        if (!eq(existing.getStock(), data.getStock()))
+            changes.add("Stock: " + existing.getStock() + " → " + data.getStock());
+
         existing.setName(data.getName());
         existing.setReference(data.getReference());
         existing.setCategory(data.getCategory());
         existing.setPrice(data.getPrice());
         existing.setStock(data.getStock());
-        if (data.getStock() != null && data.getStock() > 0) {
-            existing.setActive(true);
-        }
-        return spareRepository.save(existing);
+        if (data.getStock() != null && data.getStock() > 0) existing.setActive(true);
+        existing.setModifiedBy(modifiedBy);
+        Spare saved = spareRepository.save(existing);
+
+        String details = changes.isEmpty() ? "Sin cambios detectados" : String.join(" | ", changes);
+        auditLogService.log("REPUESTO", saved.getId(), spareDesc(saved), AuditAction.EDITAR, details, modifiedBy);
+        return saved;
     }
 
     @Transactional
-    public void deleteSpare(Long id) {
-        spareRepository.delete(findSpareById(id));
+    public void deleteSpare(Long id, String deletedBy) {
+        Spare s = findSpareById(id);
+        String desc = spareDesc(s);
+        int stockAtDelete = s.getStock();
+        s.setDeletedAt(java.time.LocalDateTime.now());
+        s.setActive(false);
+        s.setDeletedBy(deletedBy);
+        spareRepository.save(s);
+        auditLogService.log("REPUESTO", s.getId(), desc, AuditAction.ELIMINAR,
+                "Stock al eliminar: " + stockAtDelete, deletedBy);
     }
 
     @Transactional
@@ -125,19 +211,18 @@ public class InventoryService {
         Spare spare = findSpareById(id);
         if (spare.getStock() < quantity) {
             throw new InsufficientStockException(
-                    "Insufficient stock for spare part: " + spare.getName()
-            );
+                    "Insufficient stock for spare part: " + spare.getName());
         }
-        int newStock = spare.getStock() - quantity;
+        int before = spare.getStock();
+        int newStock = before - quantity;
         spare.setStock(newStock);
-        if (newStock <= 0) {
-            spare.setStock(0);
-            spare.setActive(false);
-        }
+        if (newStock <= 0) { spare.setStock(0); spare.setActive(false); }
         spareRepository.save(spare);
+        auditLogService.log("REPUESTO", spare.getId(), spareDesc(spare), AuditAction.EDITAR,
+                "Stock por venta: " + before + " → " + spare.getStock(), "sistema");
     }
 
-    // ── Stock alerts (used by NotificationService) ────────────────────────────
+    // ── Stock alerts ──────────────────────────────────────────────────────────
 
     @Transactional(readOnly = true)
     public List<Vehicle> findVehiclesWithLowStock() {
@@ -146,6 +231,30 @@ public class InventoryService {
 
     @Transactional(readOnly = true)
     public List<Spare> findSparesWithLowStock() {
-        return spareRepository.findByActiveTrueAndStockLessThanEqual(MIN_STOCK_THRESHOLD);
+        return spareRepository.findByStockLessThanEqual(MIN_STOCK_THRESHOLD);
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private String vehicleDesc(Vehicle v) {
+        return (v.getPlaca() != null ? v.getPlaca() + " — " : "")
+                + v.getBrand() + " " + v.getModel() + " " + v.getYear();
+    }
+
+    private String spareDesc(Spare s) {
+        return s.getName() + " (" + s.getReference() + ")";
+    }
+
+    private String nvl(String s) {
+        return s != null ? s : "—";
+    }
+
+    private String fmt(Double d) {
+        if (d == null) return "0";
+        return String.format("%,.0f", d).replace(",", ".");
+    }
+
+    private boolean eq(Object a, Object b) {
+        return Objects.equals(a, b);
     }
 }
