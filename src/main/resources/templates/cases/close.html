@@ -103,7 +103,7 @@
                 <input type="hidden" name="itemProductId" value="0">
                 <div class="col-md-5">
                     <input type="text" name="itemProductName" class="form-control form-control-sm"
-                           th:value="${sc.laborDescription != null and !sc.laborDescription.isEmpty()} ? sc.laborDescription : 'Mano de obra'">
+                           th:value="${sc.laborDescription != null and !sc.laborDescription.isEmpty() ? sc.laborDescription : 'Mano de obra'}">
                     <div class="form-text text-warning-emphasis small">Cargado por el técnico</div>
                 </div>
                 <div class="col-md-2">
