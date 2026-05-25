@@ -51,7 +51,7 @@ public class InventoryService {
     }
 
     @Transactional
-    public Vehicle updateVehicle(Long id, Vehicle data) {
+    public Vehicle updateVehicle(Long id, Vehicle data, String modifiedBy) {
         Vehicle existing = findVehicleById(id);
         existing.setPlaca(data.getPlaca());
         existing.setColor(data.getColor());
@@ -63,14 +63,16 @@ public class InventoryService {
         if (data.getStock() != null && data.getStock() > 0) {
             existing.setActive(true);
         }
+        existing.setModifiedBy(modifiedBy);
         return vehicleRepository.save(existing);
     }
 
     @Transactional
-    public void deleteVehicle(Long id) {
+    public void deleteVehicle(Long id, String deletedBy) {
         Vehicle v = findVehicleById(id);
         v.setDeletedAt(java.time.LocalDateTime.now());
         v.setActive(false);
+        v.setDeletedBy(deletedBy);
         vehicleRepository.save(v);
     }
 
@@ -115,7 +117,7 @@ public class InventoryService {
     }
 
     @Transactional
-    public Spare updateSpare(Long id, Spare data) {
+    public Spare updateSpare(Long id, Spare data, String modifiedBy) {
         Spare existing = findSpareById(id);
         existing.setName(data.getName());
         existing.setReference(data.getReference());
@@ -125,14 +127,16 @@ public class InventoryService {
         if (data.getStock() != null && data.getStock() > 0) {
             existing.setActive(true);
         }
+        existing.setModifiedBy(modifiedBy);
         return spareRepository.save(existing);
     }
 
     @Transactional
-    public void deleteSpare(Long id) {
+    public void deleteSpare(Long id, String deletedBy) {
         Spare s = findSpareById(id);
         s.setDeletedAt(java.time.LocalDateTime.now());
         s.setActive(false);
+        s.setDeletedBy(deletedBy);
         spareRepository.save(s);
     }
 

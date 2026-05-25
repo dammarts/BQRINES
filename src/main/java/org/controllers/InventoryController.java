@@ -5,6 +5,7 @@ import org.models.Vehicle;
 import org.services.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -60,17 +61,18 @@ public class InventoryController {
 
     @PostMapping("/vehicles/update/{id}")
     @PreAuthorize("hasRole('GERENTE')")
-    public String updateVehicle(@PathVariable Long id, @ModelAttribute Vehicle vehicle, RedirectAttributes flash) {
-        inventoryService.updateVehicle(id, vehicle);
-        flash.addFlashAttribute("success", "Vehicle updated successfully.");
+    public String updateVehicle(@PathVariable Long id, @ModelAttribute Vehicle vehicle,
+                                Authentication auth, RedirectAttributes flash) {
+        inventoryService.updateVehicle(id, vehicle, auth.getName());
+        flash.addFlashAttribute("success", "Vehículo actualizado exitosamente.");
         return "redirect:/inventory/vehicles";
     }
 
     @GetMapping("/vehicles/delete/{id}")
     @PreAuthorize("hasRole('GERENTE')")
-    public String deleteVehicle(@PathVariable Long id, RedirectAttributes flash) {
-        inventoryService.deleteVehicle(id);
-        flash.addFlashAttribute("success", "Vehicle deleted successfully.");
+    public String deleteVehicle(@PathVariable Long id, Authentication auth, RedirectAttributes flash) {
+        inventoryService.deleteVehicle(id, auth.getName());
+        flash.addFlashAttribute("success", "Vehículo eliminado exitosamente.");
         return "redirect:/inventory/vehicles";
     }
 
@@ -113,17 +115,18 @@ public class InventoryController {
 
     @PostMapping("/spares/update/{id}")
     @PreAuthorize("hasAnyRole('GERENTE', 'ASESOR_COMERCIAL')")
-    public String updateSpare(@PathVariable Long id, @ModelAttribute Spare spare, RedirectAttributes flash) {
-        inventoryService.updateSpare(id, spare);
-        flash.addFlashAttribute("success", "Spare part updated successfully.");
+    public String updateSpare(@PathVariable Long id, @ModelAttribute Spare spare,
+                              Authentication auth, RedirectAttributes flash) {
+        inventoryService.updateSpare(id, spare, auth.getName());
+        flash.addFlashAttribute("success", "Repuesto actualizado exitosamente.");
         return "redirect:/inventory/spares";
     }
 
     @GetMapping("/spares/delete/{id}")
     @PreAuthorize("hasRole('GERENTE')")
-    public String deleteSpare(@PathVariable Long id, RedirectAttributes flash) {
-        inventoryService.deleteSpare(id);
-        flash.addFlashAttribute("success", "Spare part deleted successfully.");
+    public String deleteSpare(@PathVariable Long id, Authentication auth, RedirectAttributes flash) {
+        inventoryService.deleteSpare(id, auth.getName());
+        flash.addFlashAttribute("success", "Repuesto eliminado exitosamente.");
         return "redirect:/inventory/spares";
     }
 }

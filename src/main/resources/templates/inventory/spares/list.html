@@ -71,11 +71,11 @@
                         </td>
                         <td class="small text-muted">
                             <span th:if="${s.createdAt != null}"
-                                  th:title="${s.updatedAt != null ? 'Editado: ' + #temporals.format(s.updatedAt, 'dd/MM/yyyy HH:mm') : 'Sin ediciones'}"
+                                  th:title="${s.updatedAt != null ? 'Editado: ' + #temporals.format(s.updatedAt, 'dd/MM/yyyy HH:mm') + (s.modifiedBy != null ? ' por ' + s.modifiedBy : '') : 'Sin ediciones'}"
                                   th:text="${#temporals.format(s.createdAt, 'dd/MM/yyyy HH:mm')}"
                                   style="cursor:default;" data-bs-toggle="tooltip"></span>
                             <span th:if="${s.createdAt == null and s.updatedAt != null}"
-                                  th:title="'Editado: ' + ${#temporals.format(s.updatedAt, 'dd/MM/yyyy HH:mm')}"
+                                  th:title="'Editado: ' + ${#temporals.format(s.updatedAt, 'dd/MM/yyyy HH:mm')} + ${s.modifiedBy != null ? ' por ' + s.modifiedBy : ''}"
                                   th:text="'Act. ' + ${#temporals.format(s.updatedAt, 'dd/MM/yyyy HH:mm')}"
                                   style="cursor:default;" data-bs-toggle="tooltip"></span>
                             <span th:if="${s.createdAt == null and s.updatedAt == null}">—</span>

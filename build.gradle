@@ -33,7 +33,13 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
 
-    // Testing 
+    // PDF export (OpenPDF — open-source iText fork, no license restrictions)
+    implementation 'com.github.librepdf:openpdf:1.3.30'
+
+    // Excel export (Apache POI)
+    implementation 'org.apache.poi:poi-ooxml:5.2.5'
+
+    // Testing
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

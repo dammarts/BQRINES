@@ -52,6 +52,12 @@ public class Spare {
 
     private LocalDateTime deletedAt;
 
+    @Column(length = 150)
+    private String modifiedBy;
+
+    @Column(length = 150)
+    private String deletedBy;
+
     @PrePersist
     private void onCreate() {
         this.createdAt = LocalDateTime.now();
