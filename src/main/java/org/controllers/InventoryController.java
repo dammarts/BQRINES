@@ -35,8 +35,18 @@ public class InventoryController {
     @PostMapping("/vehicles/save")
     @PreAuthorize("hasRole('GERENTE')")
     public String saveVehicle(@ModelAttribute Vehicle vehicle, RedirectAttributes flash) {
+        if (vehicle.getPlaca() != null && !vehicle.getPlaca().isBlank()) {
+            var existing = inventoryService.findVehicleByPlaca(vehicle.getPlaca().toUpperCase().trim());
+            if (existing.isPresent()) {
+                flash.addFlashAttribute("warning",
+                        "Ya existe un vehículo con la placa '" + vehicle.getPlaca().toUpperCase().trim() +
+                        "'. Actualízalo desde aquí.");
+                return "redirect:/inventory/vehicles/edit/" + existing.get().getId();
+            }
+            vehicle.setPlaca(vehicle.getPlaca().toUpperCase().trim());
+        }
         inventoryService.saveVehicle(vehicle);
-        flash.addFlashAttribute("success", "Vehicle registered successfully.");
+        flash.addFlashAttribute("success", "Vehículo registrado exitosamente.");
         return "redirect:/inventory/vehicles";
     }
 

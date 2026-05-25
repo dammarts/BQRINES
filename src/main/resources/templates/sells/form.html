@@ -26,135 +26,234 @@
         </a>
     </div>
 
-    <div class="form-card">
-        <form th:action="@{/sells/save}" th:object="${sell}" method="post" id="sellForm">
+    <div class="row g-3">
 
-            <!-- Hidden product id -->
-            <input type="hidden" id="productId" name="productId">
+        <!-- Left: product selector -->
+        <div class="col-lg-5">
+            <div class="form-card h-100">
+                <h6 class="fw-bold mb-3 text-muted text-uppercase" style="font-size:.75rem;letter-spacing:.5px;">
+                    <i class="fas fa-plus-circle me-1"></i>Agregar producto
+                </h6>
 
-            <div class="row g-3">
-                <div class="col-12">
-                    <label class="form-label">Nombre del cliente</label>
-                    <input type="text" th:field="*{clientName}" class="form-control"
-                           placeholder="Juan Pérez" required maxlength="150">
-                </div>
-
-                <div class="col-md-6">
+                <div class="mb-3">
                     <label class="form-label">Tipo de producto</label>
-                    <select id="productType" name="productType" class="form-select" required onchange="toggleProduct()">
+                    <select id="productType" class="form-select" onchange="toggleProduct()">
                         <option value="">-- Seleccionar tipo --</option>
                         <option value="vehicle">Vehículo</option>
                         <option value="spares">Repuesto</option>
                     </select>
                 </div>
 
-                <!-- Vehicle selector -->
-                <div class="col-md-6" id="vehicleGroup" style="display:none;">
+                <div id="vehicleGroup" style="display:none;" class="mb-3">
                     <label class="form-label">Vehículo</label>
                     <select id="vehicleSelect" class="form-select" onchange="syncProduct(this)">
                         <option value="">-- Seleccionar vehículo --</option>
                         <option th:each="v : ${vehicles}"
                                 th:value="${v.id}"
-                                th:text="${v.brand + ' ' + v.model + ' ' + v.year + ' — Stock: ' + v.stock}"
-                                th:attr="data-price=${v.price},data-stock=${v.stock}">
+                                th:text="${(v.placa != null ? v.placa + ' — ' : '') + v.brand + ' ' + v.model + ' ' + v.year + ' | Stock: ' + v.stock}"
+                                th:attr="data-price=${v.price},data-stock=${v.stock},data-name=${(v.placa != null ? v.placa + ' — ' : '') + v.brand + ' ' + v.model + ' ' + v.year}">
                         </option>
                     </select>
                 </div>
 
-                <!-- Spare selector -->
-                <div class="col-md-6" id="spareGroup" style="display:none;">
+                <div id="spareGroup" style="display:none;" class="mb-3">
                     <label class="form-label">Repuesto</label>
                     <select id="spareSelect" class="form-select" onchange="syncProduct(this)">
                         <option value="">-- Seleccionar repuesto --</option>
                         <option th:each="s : ${spares}"
                                 th:value="${s.id}"
-                                th:text="${s.name + ' (' + s.reference + ') — Stock: ' + s.stock}"
-                                th:attr="data-price=${s.price},data-stock=${s.stock}">
+                                th:text="${s.name + ' (' + s.reference + ') | Stock: ' + s.stock}"
+                                th:attr="data-price=${s.price},data-stock=${s.stock},data-name=${s.name + ' (' + s.reference + ')'}">
                         </option>
                     </select>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="form-label">Precio unitario ($)</label>
-                    <input type="number" id="unitaryPrice" name="unitaryPrice"
-                           class="form-control" placeholder="0.00"
-                           min="0" step="0.01" required>
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Cantidad</label>
-                    <input type="number" th:field="*{quantity}"
-                           class="form-control" placeholder="1"
-                           min="1" required oninput="updateTotal()">
-                </div>
-
-                <div class="col-12">
-                    <div class="p-3 rounded border bg-light d-flex justify-content-between align-items-center">
-                        <span class="text-muted">Total estimado</span>
-                        <span id="totalDisplay" class="fw-bold fs-5" style="color:var(--bq-primary)">$0</span>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label">Precio ($)</label>
+                        <input type="number" id="unitaryPrice" class="form-control"
+                               placeholder="0.00" min="0" step="0.01">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Cantidad</label>
+                        <input type="number" id="qty" class="form-control"
+                               placeholder="1" min="1" value="1">
                     </div>
                 </div>
-            </div>
 
-            <div class="d-flex gap-2 mt-4">
-                <button type="submit" class="btn btn-primary px-4" id="submitBtn" disabled>
-                    <i class="fas fa-save me-2"></i>Confirmar Venta
+                <button type="button" class="btn btn-primary w-100" onclick="addToCart()">
+                    <i class="fas fa-cart-plus me-2"></i>Agregar al carrito
                 </button>
-                <a th:href="@{/sells}" class="btn btn-outline-secondary px-4">Cancelar</a>
             </div>
-        </form>
-    </div>
+        </div>
 
+        <!-- Right: cart + submit -->
+        <div class="col-lg-7">
+            <div class="form-card" style="max-width:100%;">
+                <h6 class="fw-bold mb-3 text-muted text-uppercase" style="font-size:.75rem;letter-spacing:.5px;">
+                    <i class="fas fa-shopping-bag me-1"></i>Carrito
+                </h6>
+
+                <form id="sellForm" th:action="@{/sells/save}" method="post">
+
+                    <div class="mb-3">
+                        <label class="form-label">Cliente</label>
+                        <input type="text" name="clientName" class="form-control"
+                               placeholder="Nombre del cliente" required maxlength="150">
+                    </div>
+
+                    <!-- Cart items hidden inputs are injected here by JS -->
+                    <div id="hiddenInputs"></div>
+
+                    <!-- Cart table -->
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm" id="cartTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Tipo</th>
+                                    <th class="text-center">Cant.</th>
+                                    <th class="text-end">Precio</th>
+                                    <th class="text-end">Subtotal</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="cartBody">
+                                <tr id="emptyRow">
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        <i class="fas fa-cart-arrow-down me-1"></i>Agrega productos al carrito
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-3 rounded border bg-light">
+                        <span class="fw-bold">TOTAL</span>
+                        <span id="totalDisplay" class="fw-bold fs-5" style="color:var(--bq-primary)">$0</span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" id="submitBtn" class="btn btn-primary px-4" disabled>
+                            <i class="fas fa-save me-2"></i>Confirmar Venta
+                        </button>
+                        <a th:href="@{/sells}" class="btn btn-outline-secondary px-4">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+let cart = [];
+
 function toggleProduct() {
     const type = document.getElementById('productType').value;
-    document.getElementById('vehicleGroup').style.display = (type === 'vehicle') ? '' : 'none';
-    document.getElementById('spareGroup').style.display  = (type === 'spares')  ? '' : 'none';
+    document.getElementById('vehicleGroup').style.display = type === 'vehicle' ? '' : 'none';
+    document.getElementById('spareGroup').style.display  = type === 'spares'  ? '' : 'none';
     document.getElementById('vehicleSelect').value = '';
     document.getElementById('spareSelect').value  = '';
-    document.getElementById('productId').value    = '';
     document.getElementById('unitaryPrice').value = '';
-    document.getElementById('totalDisplay').textContent = '$0';
-    const qtyInput = document.querySelector('[name="quantity"]');
-    qtyInput.removeAttribute('max');
-    qtyInput.value = '';
-    checkSubmit();
+    document.getElementById('qty').removeAttribute('max');
+    document.getElementById('qty').value = 1;
 }
 
 function syncProduct(sel) {
     const opt = sel.options[sel.selectedIndex];
-    document.getElementById('productId').value = opt.value;
-    if (opt.dataset.price) {
-        document.getElementById('unitaryPrice').value = opt.dataset.price;
-    }
-    const qtyInput = document.querySelector('[name="quantity"]');
+    if (opt.dataset.price) document.getElementById('unitaryPrice').value = opt.dataset.price;
     if (opt.dataset.stock) {
-        qtyInput.max = opt.dataset.stock;
-        if (parseInt(qtyInput.value) > parseInt(opt.dataset.stock)) {
-            qtyInput.value = opt.dataset.stock;
-        }
+        document.getElementById('qty').max = opt.dataset.stock;
+        document.getElementById('qty').value = 1;
     }
-    updateTotal();
-    checkSubmit();
 }
 
-function updateTotal() {
-    const price = parseFloat(document.getElementById('unitaryPrice').value) || 0;
-    const qty   = parseInt(document.querySelector('[name="quantity"]').value) || 0;
-    document.getElementById('totalDisplay').textContent = '$' + (price * qty).toLocaleString('es-CO');
-    checkSubmit();
+function addToCart() {
+    const type  = document.getElementById('productType').value;
+    const price = parseFloat(document.getElementById('unitaryPrice').value);
+    const qty   = parseInt(document.getElementById('qty').value);
+
+    let sel, productId, productName;
+    if (type === 'vehicle') {
+        sel = document.getElementById('vehicleSelect');
+    } else if (type === 'spares') {
+        sel = document.getElementById('spareSelect');
+    } else {
+        alert('Selecciona el tipo de producto.'); return;
+    }
+
+    const opt = sel.options[sel.selectedIndex];
+    if (!opt || !opt.value) { alert('Selecciona un producto.'); return; }
+    if (!price || price <= 0) { alert('Ingresa un precio válido.'); return; }
+    if (!qty   || qty <= 0)  { alert('Ingresa una cantidad válida.'); return; }
+    if (opt.dataset.stock && qty > parseInt(opt.dataset.stock)) {
+        alert('La cantidad supera el stock disponible (' + opt.dataset.stock + ' uds.).'); return;
+    }
+
+    productId   = opt.value;
+    productName = opt.dataset.name || opt.text;
+
+    const item = { type, productId, productName, qty, price, subtotal: price * qty };
+    cart.push(item);
+    renderCart();
+
+    // Reset selector side
+    sel.value = '';
+    document.getElementById('unitaryPrice').value = '';
+    document.getElementById('qty').value = 1;
+    document.getElementById('qty').removeAttribute('max');
 }
 
-function checkSubmit() {
-    const type    = document.getElementById('productType').value;
-    const pid     = document.getElementById('productId').value;
-    const price   = document.getElementById('unitaryPrice').value;
-    const qty     = document.querySelector('[name="quantity"]').value;
-    const client  = document.querySelector('[name="clientName"]').value;
-    document.getElementById('submitBtn').disabled = !(type && pid && price && qty && client);
+function removeFromCart(idx) {
+    cart.splice(idx, 1);
+    renderCart();
+}
+
+function renderCart() {
+    const tbody  = document.getElementById('cartBody');
+    const hidden = document.getElementById('hiddenInputs');
+    tbody.innerHTML  = '';
+    hidden.innerHTML = '';
+
+    if (cart.length === 0) {
+        tbody.innerHTML = '<tr id="emptyRow"><td colspan="6" class="text-center text-muted py-4"><i class="fas fa-cart-arrow-down me-1"></i>Agrega productos al carrito</td></tr>';
+        document.getElementById('totalDisplay').textContent = '$0';
+        document.getElementById('submitBtn').disabled = true;
+        return;
+    }
+
+    let total = 0;
+    cart.forEach((item, i) => {
+        total += item.subtotal;
+        const typeLabel = item.type === 'vehicle'
+            ? '<span class="badge bg-primary-subtle text-primary">Vehículo</span>'
+            : '<span class="badge bg-warning-subtle text-warning-emphasis">Repuesto</span>';
+
+        tbody.innerHTML += `
+            <tr>
+                <td class="fw-semibold">${item.productName}</td>
+                <td>${typeLabel}</td>
+                <td class="text-center">${item.qty}</td>
+                <td class="text-end">$${item.price.toLocaleString('es-CO')}</td>
+                <td class="text-end fw-semibold">$${item.subtotal.toLocaleString('es-CO')}</td>
+                <td class="text-end">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFromCart(${i})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </td>
+            </tr>`;
+
+        hidden.innerHTML += `
+            <input type="hidden" name="itemProductType"  value="${item.type}">
+            <input type="hidden" name="itemProductId"    value="${item.productId}">
+            <input type="hidden" name="itemProductName"  value="${item.productName}">
+            <input type="hidden" name="itemQuantity"     value="${item.qty}">
+            <input type="hidden" name="itemUnitaryPrice" value="${item.price}">`;
+    });
+
+    document.getElementById('totalDisplay').textContent = '$' + total.toLocaleString('es-CO');
+    document.getElementById('submitBtn').disabled = false;
 }
 </script>
 </body>

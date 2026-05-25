@@ -1,6 +1,7 @@
 package org.controllers;
 
 import org.models.Sell;
+import org.models.SellItem;
 import org.services.InventoryService;
 import org.services.SellService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/sells")
@@ -30,26 +34,41 @@ public class SellController {
 
     @GetMapping("/new")
     public String newForm(Model model) {
-        model.addAttribute("sell", new Sell());
         model.addAttribute("vehicles", inventoryService.findActiveVehicles());
         model.addAttribute("spares", inventoryService.findActiveSpares());
         return "sells/form";
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute Sell sell, Authentication auth, RedirectAttributes flash) {
+    public String save(
+            @RequestParam String clientName,
+            @RequestParam("itemProductType") List<String> productTypes,
+            @RequestParam("itemProductId") List<Long> productIds,
+            @RequestParam("itemProductName") List<String> productNames,
+            @RequestParam("itemQuantity") List<Integer> quantities,
+            @RequestParam("itemUnitaryPrice") List<Double> unitaryPrices,
+            Authentication auth, RedirectAttributes flash) {
+
+        Sell sell = new Sell();
+        sell.setClientName(clientName);
         sell.setRegisteredBy(auth.getName());
 
-        if ("vehicle".equalsIgnoreCase(sell.getProductType())) {
-            var v = inventoryService.findVehicleById(sell.getProductId());
-            sell.setProductName(v.getBrand() + " " + v.getModel() + " " + v.getYear());
-        } else if ("spares".equalsIgnoreCase(sell.getProductType())) {
-            var s = inventoryService.findSpareById(sell.getProductId());
-            sell.setProductName(s.getName() + " (" + s.getReference() + ")");
+        List<SellItem> items = new ArrayList<>();
+        for (int i = 0; i < productTypes.size(); i++) {
+            SellItem item = new SellItem();
+            item.setProductType(productTypes.get(i));
+            item.setProductId(productIds.get(i));
+            item.setProductName(productNames.get(i));
+            item.setQuantity(quantities.get(i));
+            item.setUnitaryPrice(unitaryPrices.get(i));
+            item.setSubtotal(unitaryPrices.get(i) * quantities.get(i));
+            item.setSell(sell);
+            items.add(item);
         }
+        sell.setItems(items);
 
         Sell saved = sellService.registerSell(sell);
-        flash.addFlashAttribute("success", "Sale registered successfully.");
+        flash.addFlashAttribute("success", "Venta registrada exitosamente.");
         return "redirect:/sells/voucher/" + saved.getId();
     }
 

@@ -40,6 +40,11 @@ public class InventoryService {
                 .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + id));
     }
 
+    @Transactional(readOnly = true)
+    public java.util.Optional<Vehicle> findVehicleByPlaca(String placa) {
+        return vehicleRepository.findByPlaca(placa);
+    }
+
     @Transactional
     public Vehicle saveVehicle(Vehicle vehicle) {
         return vehicleRepository.save(vehicle);
@@ -48,11 +53,16 @@ public class InventoryService {
     @Transactional
     public Vehicle updateVehicle(Long id, Vehicle data) {
         Vehicle existing = findVehicleById(id);
+        existing.setPlaca(data.getPlaca());
+        existing.setColor(data.getColor());
         existing.setBrand(data.getBrand());
         existing.setModel(data.getModel());
         existing.setYear(data.getYear());
         existing.setPrice(data.getPrice());
         existing.setStock(data.getStock());
+        if (data.getStock() != null && data.getStock() > 0) {
+            existing.setActive(true);
+        }
         return vehicleRepository.save(existing);
     }
 

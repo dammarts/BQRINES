@@ -1,16 +1,22 @@
 package org.models;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "sells")
@@ -29,28 +35,14 @@ public class Sell {
     @Column(nullable = false, length = 150)
     private String clientName;
 
-    // Type of product sold: "vehicle" or "spares"
-    @Column(nullable = false, length = 50)
-    private String productType;
-
-    @Column(nullable = false)
-    private Long productId;
-    
-    @Column(nullable = false, length = 200)
-    private String productName;
-    
-    @Column(nullable = false)
-    private Integer quantity;
-
-    @Column(nullable = false)
-    private Double unitaryPrice;
-
     @Column(nullable = false)
     private Double total;
 
-    // Actor who registered the sale (email of the user)
     @Column(nullable = false, length = 150, updatable = false)
     private String registeredBy;
+
+    @OneToMany(mappedBy = "sell", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<SellItem> items = new ArrayList<>();
 
     @PrePersist
     private void prePersist() {
