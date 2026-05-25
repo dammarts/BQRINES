@@ -77,6 +77,18 @@
                     </a>
                 </li>
 
+                <li class="nav-item" sec:authorize="hasAnyRole('GERENTE','SERVICIO_TECNICO')">
+                    <a class="nav-link" th:href="@{/clients}">
+                        <i class="fas fa-users me-1"></i> Clientes
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('GERENTE','ASESOR_COMERCIAL','SERVICIO_TECNICO')">
+                    <a class="nav-link" th:href="@{/cases}">
+                        <i class="fas fa-clipboard-list me-1"></i> Casos
+                    </a>
+                </li>
+
             </ul>
 
             <div class="d-flex align-items-center gap-3">

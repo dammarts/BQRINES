@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Vehículo | BQRINES</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="main-content container" style="max-width:750px;">
+
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="page-header">
+        <h2><i class="fas fa-car-side me-2"></i>Registrar Vehículo y Cliente</h2>
+        <a th:href="@{/clients}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Volver
+        </a>
+    </div>
+
+    <form th:action="@{/clients/save-vehicle}" method="post" class="card p-4">
+
+        <h5 class="mb-3 text-primary"><i class="fas fa-car me-2"></i>Datos del Vehículo</h5>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Placa <span class="text-danger">*</span></label>
+                <input type="text" name="placa" class="form-control text-uppercase" required
+                       maxlength="20" placeholder="Ej: ABC123">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Marca <span class="text-danger">*</span></label>
+                <input type="text" name="brand" class="form-control" required maxlength="100">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Modelo <span class="text-danger">*</span></label>
+                <input type="text" name="model2" class="form-control" required maxlength="100">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Año <span class="text-danger">*</span></label>
+                <input type="number" name="year" class="form-control" required
+                       min="1950" th:max="${#dates.year(#dates.createNow()) + 1}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Color</label>
+                <input type="text" name="color" class="form-control" maxlength="50">
+            </div>
+        </div>
+
+        <h5 class="mb-3 text-primary"><i class="fas fa-user me-2"></i>Datos del Cliente</h5>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Nombre completo <span class="text-danger">*</span></label>
+                <input type="text" name="clientName" class="form-control" required maxlength="150">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Documento (CC / NIT / CE)</label>
+                <input type="text" name="clientDocument" class="form-control" maxlength="50">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Teléfono</label>
+                <input type="text" name="clientPhone" class="form-control" maxlength="20">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Email</label>
+                <input type="email" name="clientEmail" class="form-control" maxlength="150">
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-1"></i>Guardar
+            </button>
+            <a th:href="@{/clients}" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

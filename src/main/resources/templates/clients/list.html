@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes | BQRINES</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="main-content container-fluid">
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+        <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="page-header">
+        <h2><i class="fas fa-users me-2"></i>Clientes y Vehículos</h2>
+        <a th:href="@{/clients/new-vehicle}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Nuevo Vehículo
+        </a>
+    </div>
+
+    <!-- Quick placa lookup -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form th:action="@{/cases/new}" method="get" class="row g-2 align-items-end">
+                <div class="col-auto">
+                    <label class="form-label fw-semibold">Buscar por placa para crear caso</label>
+                    <input type="text" name="placa" class="form-control text-uppercase"
+                           placeholder="Ej: ABC123" style="max-width:180px;">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-tools me-1"></i>Crear Caso
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Cliente</th>
+                        <th>Documento</th>
+                        <th>Teléfono</th>
+                        <th>Email</th>
+                        <th>Vehículos</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(clients)}">
+                        <td colspan="7" class="text-center text-muted py-5">
+                            <i class="fas fa-users fa-2x mb-2 d-block opacity-25"></i>
+                            No hay clientes registrados.
+                        </td>
+                    </tr>
+                    <tr th:each="c : ${clients}">
+                        <td class="text-muted small" th:text="${c.id}"></td>
+                        <td class="fw-semibold" th:text="${c.name}"></td>
+                        <td th:text="${c.document ?: '-'}"></td>
+                        <td th:text="${c.phone ?: '-'}"></td>
+                        <td th:text="${c.email ?: '-'}"></td>
+                        <td>
+                            <span th:each="v, i : ${c.vehicles}"
+                                  class="badge bg-secondary me-1"
+                                  th:text="${v.placa}"></span>
+                            <span th:if="${#lists.isEmpty(c.vehicles)}" class="text-muted small">ninguno</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/clients/edit/{id}(id=${c.id})}"
+                               class="btn btn-sm btn-outline-secondary me-1">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a th:each="v : ${c.vehicles}"
+                               th:href="@{/cases/new(placa=${v.placa})}"
+                               class="btn btn-sm btn-outline-success"
+                               th:title="${'Caso para ' + v.placa}">
+                                <i class="fas fa-tools"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
