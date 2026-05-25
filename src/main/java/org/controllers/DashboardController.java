@@ -5,7 +5,6 @@ import org.services.InventoryService;
 import org.services.NotificationService;
 import org.services.SellService;
 import org.services.ServiceCaseService;
-import org.services.ServiceRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -25,9 +24,6 @@ public class DashboardController {
     private SellService sellService;
 
     @Autowired
-    private ServiceRequestService serviceRequestService;
-
-    @Autowired
     private ServiceCaseService serviceCaseService;
 
     // Redirects each role to its own dashboard after login
@@ -42,7 +38,6 @@ public class DashboardController {
                 model.addAttribute("totalSells", sellService.findAll().size());
                 model.addAttribute("spareAlerts", notificationService.getSparesWithLowStock());
                 model.addAttribute("totalAlerts", notificationService.getTotalAlerts());
-                model.addAttribute("openRequests", serviceRequestService.countOpen());
                 model.addAttribute("openCases", serviceCaseService.countByStatus(CaseStatus.RECIBIDO)
                         + serviceCaseService.countByStatus(CaseStatus.EN_DIAGNOSTICO)
                         + serviceCaseService.countByStatus(CaseStatus.EN_REPARACION)
