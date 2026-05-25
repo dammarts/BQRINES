@@ -146,6 +146,6 @@ public class InventoryService {
 
     @Transactional(readOnly = true)
     public List<Spare> findSparesWithLowStock() {
-        return spareRepository.findByActiveTrueAndStockLessThanEqual(MIN_STOCK_THRESHOLD);
+        return spareRepository.findByStockLessThanEqual(MIN_STOCK_THRESHOLD);
     }
 }
