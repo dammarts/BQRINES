@@ -36,7 +36,7 @@ public class InventoryController {
 
     @PostMapping("/vehicles/save")
     @PreAuthorize("hasRole('GERENTE')")
-    public String saveVehicle(@ModelAttribute Vehicle vehicle, RedirectAttributes flash) {
+    public String saveVehicle(@ModelAttribute Vehicle vehicle, Authentication auth, RedirectAttributes flash) {
         if (vehicle.getPlaca() != null && !vehicle.getPlaca().isBlank()) {
             var existing = inventoryService.findVehicleByPlaca(vehicle.getPlaca().toUpperCase().trim());
             if (existing.isPresent()) {
@@ -47,7 +47,7 @@ public class InventoryController {
             }
             vehicle.setPlaca(vehicle.getPlaca().toUpperCase().trim());
         }
-        inventoryService.saveVehicle(vehicle);
+        inventoryService.saveVehicle(vehicle, auth.getName());
         flash.addFlashAttribute("success", "Vehículo registrado exitosamente.");
         return "redirect:/inventory/vehicles";
     }
@@ -93,7 +93,7 @@ public class InventoryController {
 
     @PostMapping("/spares/save")
     @PreAuthorize("hasAnyRole('GERENTE', 'ASESOR_COMERCIAL')")
-    public String saveSpare(@ModelAttribute Spare spare, RedirectAttributes flash) {
+    public String saveSpare(@ModelAttribute Spare spare, Authentication auth, RedirectAttributes flash) {
         var existing = inventoryService.findSpareByReference(spare.getReference());
         if (existing.isPresent()) {
             flash.addFlashAttribute("warning",
@@ -101,7 +101,7 @@ public class InventoryController {
                     "'. Actualiza su stock desde aquí.");
             return "redirect:/inventory/spares/edit/" + existing.get().getId();
         }
-        inventoryService.saveSpare(spare);
+        inventoryService.saveSpare(spare, auth.getName());
         flash.addFlashAttribute("success", "Repuesto registrado exitosamente.");
         return "redirect:/inventory/spares";
     }
